@@ -6,7 +6,7 @@
 
 ---
 
-## Section 1: Scope
+## Q1: What are we working on?
 
 ### 1.1 System boundary
 
@@ -56,7 +56,9 @@
 
 ---
 
-## Section 2: Threat Identification
+## Q2: What can go wrong?
+
+### 2.1 Threat identification
 
 *Use STRIDE categories and/or MITRE ATT&CK techniques. Write each threat as a structured statement:*  
 *"[Threat actor] can [action] the [asset/component] via [entry point], causing [impact]."*
@@ -78,7 +80,7 @@
 
 ---
 
-## Section 3: Risk Assessment
+### 2.2 Risk assessment
 
 | Threat ID | Likelihood (1–3) | Likelihood rationale | Impact (1–3) | Impact rationale | Risk score (L×I) | Patient safety override? | Priority |
 |-----------|-----------------|---------------------|-------------|-----------------|-----------------|------------------------|---------|
@@ -95,7 +97,7 @@
 
 ---
 
-## Section 4: Mitigations
+## Q3: What are we going to do about it?
 
 *For every High-priority threat, define at least one mitigation. For Medium-priority, define a mitigation or document an acceptance rationale.*
 
@@ -111,7 +113,7 @@
 
 ---
 
-## Section 5: Summary & Open Questions
+## Q4: Did we do a good job?
 
 ### Top 3 highest-risk threats
 
@@ -135,7 +137,7 @@
 
 ---
 
-## Review checklist
+### Review checklist
 
 Before submitting, confirm:
 

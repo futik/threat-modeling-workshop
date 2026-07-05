@@ -28,7 +28,7 @@ The system is **hybrid**: it has an on-premise hardware component in the hospita
 | Component | Description |
 |-----------|-------------|
 | **Imaging unit** | Physical MRI scanner with embedded firmware (proprietary RTOS) |
-| **Acquisition workstation** | Windows 11 PC connected to the imaging unit via USB/proprietary protocol. Runs the acquisition software (NeuroScan Acquire v4.2). |
+| **Acquisition workstation** | Ubuntu 22.04 LTS workstation connected to the imaging unit via USB/proprietary protocol. Runs the acquisition software (NeuroScan Acquire v4.2). |
 | **Local DICOM server** | Stores raw and processed images. Connected to hospital PACS (Picture Archiving and Communication System). |
 | **HIS/EMR interface** | HL7 FHIR API integration with the hospital's Electronic Medical Record system for patient data and orders |
 | **Local admin console** | Web-based admin UI (runs on the acquisition workstation, accessible on port 8443) |

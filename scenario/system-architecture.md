@@ -8,7 +8,7 @@
 │                                                                      │
 │  ┌──────────────┐    USB /      ┌─────────────────────────────────┐ │
 │  │              │  Proprietary  │   Acquisition Workstation        │ │
-│  │  Imaging     │◄─────────────►│   (Windows 11)                  │ │
+│  │  Imaging     │◄─────────────►│   (Ubuntu 22.04 LTS)            │ │
 │  │  Unit        │   Protocol    │                                  │ │
 │  │  (RTOS)      │               │  NeuroScan Acquire v4.2          │ │
 │  │              │               │  Local Admin Console (:8443)     │ │
@@ -89,7 +89,7 @@
 | Workstation → EMR | HL7 FHIR over HTTPS | OAuth 2.0 | |
 | Admin console | HTTPS (:8443) | Local username/password | No MFA by default |
 | Cloud dashboard | HTTPS | SSO (SAML) | |
-| Remote support | VPN + RDP | Shared credential | **Known security gap** |
+| Remote support | VPN + SSH | Shared credential | **Known security gap** |
 | Update delivery | HTTPS | Package signing (RSA-2048) + TLS | |
 
 ---

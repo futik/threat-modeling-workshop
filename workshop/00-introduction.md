@@ -5,10 +5,10 @@
 Threat modeling is a structured process for identifying security and safety threats to a system, assessing their risk, and designing countermeasures — before an attacker does it for you.
 
 At its core it answers four questions:
-1. **What are we building?** — system decomposition
-2. **What can go wrong?** — threat identification
-3. **What are we going to do about it?** — mitigations
-4. **Did we do a good enough job?** — validation
+1. **What are we working on?** — system decomposition and scoping
+2. **What can go wrong?** — threat identification and risk assessment
+3. **What are we going to do about it?** — mitigations and controls
+4. **Did we do a good job?** — validation and review
 
 ---
 
@@ -33,15 +33,14 @@ Medical devices are increasingly software-defined and network-connected. This cr
 
 This workshop is based on the [MITRE Playbook for Threat Modeling Medical Devices](https://www.mitre.org/sites/default/files/2021-11/Playbook-for-Threat-Modeling-Medical-Devices.pdf).
 
-The playbook defines a 5-step process:
+The playbook is structured around four questions:
 
-| Step | Activity |
-|------|----------|
-| 1 | **Scope** the system — define what's in and out |
-| 2 | **Identify threats** — using structured techniques |
-| 3 | **Assess risk** — likelihood × impact |
-| 4 | **Define mitigations** — controls and countermeasures |
-| 5 | **Document** — produce a threat model report |
+| Question | Activity |
+|----------|----------|
+| **Q1** | What are we working on? — scope the system, identify assets, entry points, and actors |
+| **Q2** | What can go wrong? — identify threats (STRIDE, ATT&CK) and assess their risk |
+| **Q3** | What are we going to do about it? — define mitigations and controls |
+| **Q4** | Did we do a good job? — validate completeness, document, and review |
 
 ---
 
@@ -68,4 +67,4 @@ You will threat model the **NeuroScan 3000** — a hybrid MRI-based neurological
 Then open your worksheet:
 - [`../templates/threat-model-template.md`](../templates/threat-model-template.md)
 
-You'll fill in the template section by section as you work through steps 01–05.
+You'll fill in the template section by section as you work through Q1–Q4.

@@ -1,8 +1,8 @@
-# 04 — Step 4: Mitigations & Controls
+# Q3 — What are we going to do about it?
 
 ## Goal
 
-For each High and Medium priority threat, define one or more mitigations. Mitigations reduce either likelihood (make it harder to exploit) or impact (limit damage if exploited).
+For each High and Medium priority threat from Q2, define one or more mitigations. Mitigations reduce either likelihood (make it harder to exploit) or impact (limit damage if exploited).
 
 ---
 
@@ -58,7 +58,7 @@ For each threat, document:
 
 ## Template section to fill in
 
-Open [`../templates/threat-model-template.md`](../templates/threat-model-template.md) and complete **Section 4: Mitigations**.
+Open [`../templates/threat-model-template.md`](../templates/threat-model-template.md) and complete **Q3: What are we going to do about it?**
 
 For every **High** threat, define at least one mitigation. For **Medium** threats, define at least one mitigation or a documented rationale for acceptance.
 
@@ -67,5 +67,5 @@ For every **High** threat, define at least one mitigation. For **Medium** threat
 ## Discussion questions
 
 1. MFA on the admin console adds friction for the biomedical engineer during an emergency. How do you balance this?
-2. Secure boot requires hardware changes to the imaging unit. That likely means a new FDA submission. Is it worth it?
+2. Secure boot requires hardware changes to the imaging unit — likely a new FDA submission. Is it worth it?
 3. If you can't fix the shared remote support credential before the next release, what compensating controls would you put in place?

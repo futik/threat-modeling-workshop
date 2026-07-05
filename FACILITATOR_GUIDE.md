@@ -32,7 +32,7 @@
 
 Cover the content in `workshop/00-introduction.md`:
 - Why medical device security matters (3–4 real incidents as examples: Medigate reports, FDA recalls)
-- The 5-step MITRE process
+- The four-question framework
 - What makes medical devices different from general IT
 - Overview of today's scenario (NeuroScan 3000)
 
@@ -47,10 +47,10 @@ Give groups 10 minutes to read the scenario silently.
 
 ---
 
-### Block 2 — Step 1: Scope (25 min)
+### Block 2 — Q1: What are we working on? (25 min)
 
-**5 min:** Brief explanation of scoping using `workshop/01-scoping.md`  
-**20 min:** Groups work on Section 1 of the template (assets, entry points, trust boundaries, threat actors)
+**5 min:** Brief explanation using `workshop/q1-what-are-we-working-on.md`  
+**20 min:** Groups work on Q1 of the template (assets, entry points, trust boundaries, threat actors)
 
 **Facilitation tips:**
 - Walk between groups, listen, prompt — don't give answers
@@ -62,18 +62,24 @@ Give groups 10 minutes to read the scenario silently.
 
 ---
 
-### Block 3 — Step 2: Threat Identification (40 min)
+### Block 3 — Q2: What can go wrong? (50 min)
 
-**10 min:** Explain STRIDE and MITRE ATT&CK using `workshop/02-threat-identification.md`  
-**30 min:** Groups work on Section 2 of the template
+**10 min:** Explain STRIDE and MITRE ATT&CK using `workshop/q2-what-can-go-wrong.md`  
+**25 min:** Groups identify threats (Part A of the template)  
+**15 min:** Groups score risk (Part B of the template)
 
-**Tips:**
+**Tips — threat identification:**
 - Write the STRIDE mnemonic on the board: Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege
 - Prompt for ATT&CK: "Have you looked at T0839 Module Firmware? Does that apply here?"
 - Common mistake: all threats are Information Disclosure (data breach focus); push groups to consider Tampering and DoS which have direct patient safety implications
-- If a group has fewer than 8 threats at the 20-min mark, prompt: "What could an attacker do to the update channel? What about the admin console?"
+- If a group has fewer than 8 threats at the 15-min mark, prompt: "What could an attacker do to the update channel? What about the admin console?"
 
-**Good discussion prompt for the room (15 min in):** "What's the most dangerous thing an attacker could do to this device — and I don't mean 'steal data'?"
+**Good discussion prompt for the room (halfway through):** "What's the most dangerous thing an attacker could do to this device — and I don't mean 'steal data'?"
+
+**Tips — risk scoring:**
+- Remind groups: "Likelihood scores should reflect the specific context — a hospital LAN is not the internet"
+- Common mistake: scoring everything as High/High because it's a medical device; push for differentiation
+- If a group has no patient safety overrides: ask "Which of your threats could directly harm a patient if exploited?"
 
 ---
 
@@ -81,22 +87,10 @@ Give groups 10 minutes to read the scenario silently.
 
 ---
 
-### Block 4 — Step 3: Risk Assessment (20 min)
+### Block 4 — Q3: What are we going to do about it? (30 min)
 
-**5 min:** Explain the scoring model using `workshop/03-risk-assessment.md`. Emphasize the patient safety override.  
-**15 min:** Groups score their threats
-
-**Tips:**
-- Remind groups: "Likelihood scores should reflect the specific context — a hospital LAN is not the internet"
-- Common mistake: scoring everything as High/High because it's a medical device; push for differentiation
-- If a group has no patient safety overrides: ask "Which of your threats could directly harm a patient if exploited?"
-
----
-
-### Block 5 — Step 4: Mitigations (30 min)
-
-**5 min:** Explain mitigation types using `workshop/04-mitigations.md`. Highlight the regulatory constraint discussion.  
-**25 min:** Groups work on Section 4
+**5 min:** Explain mitigation types using `workshop/q3-what-are-we-going-to-do-about-it.md`. Highlight the regulatory constraint discussion.  
+**25 min:** Groups work on Q3 of the template
 
 **Tips:**
 - Push for specificity: "What exactly does 'add encryption' mean for DICOM here?"
@@ -106,9 +100,10 @@ Give groups 10 minutes to read the scenario silently.
 
 ---
 
-### Block 6 — Group presentations (15–20 min total, ~5 min per group)
+### Block 5 — Q4: Did we do a good job? / Group presentations (25 min total)
 
-Each group presents:
+**5 min:** Groups review their work using the checklist in `workshop/q4-did-we-do-a-good-job.md`  
+**15–20 min:** Each group presents (~5 min per group):
 1. Their top 3 highest-risk threats and why
 2. Their most interesting/unexpected threat
 3. Their hardest mitigation trade-off
@@ -119,7 +114,7 @@ Other groups: ask one question after each presentation — "Did you consider X?"
 
 ---
 
-### Block 7 — Debrief & wrap-up (15 min)
+### Block 6 — Debrief & wrap-up (15 min)
 
 Cover:
 1. What most groups got right (patterns you observed)

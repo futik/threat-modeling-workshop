@@ -6,11 +6,13 @@ A hands-on workshop for security practitioners and engineers on how to threat mo
 
 ## What you will learn
 
-- How to scope and decompose a medical device system
-- How to identify threats using STRIDE and MITRE ATT&CK for ICS/Healthcare
-- How to assess and prioritize risks in a regulated medical context
-- How to propose and document mitigations
-- How AI can assist in building and evaluating threat models
+Working through four questions — *What are we working on? What can go wrong? What are we going to do about it? Did we do a good job?* — you will practice:
+
+- Scoping and decomposing a medical device system
+- Identifying threats using STRIDE and MITRE ATT&CK for ICS/Healthcare
+- Assessing and prioritizing risks in a regulated medical context
+- Proposing and documenting mitigations
+- Using AI to assist in building and evaluating threat models
 
 ---
 
@@ -26,12 +28,11 @@ threat-modeling-workshop/
 │   └── system-architecture.md       ← components, data flows, trust boundaries
 │
 ├── workshop/
-│   ├── 00-introduction.md           ← why threat model medical devices?
-│   ├── 01-scoping.md                ← step 1 — scope & system decomposition
-│   ├── 02-threat-identification.md  ← step 2 — STRIDE + MITRE ATT&CK
-│   ├── 03-risk-assessment.md        ← step 3 — likelihood, impact, prioritization
-│   ├── 04-mitigations.md            ← step 4 — controls & countermeasures
-│   └── 05-documentation.md         ← step 5 — writing the threat model report
+│   ├── 00-introduction.md                        ← why threat model medical devices?
+│   ├── q1-what-are-we-working-on.md              ← scope, assets, entry points, actors
+│   ├── q2-what-can-go-wrong.md                   ← STRIDE, MITRE ATT&CK, risk assessment
+│   ├── q3-what-are-we-going-to-do-about-it.md   ← controls & countermeasures
+│   └── q4-did-we-do-a-good-job.md               ← validation, review, documentation
 │
 ├── templates/
 │   ├── threat-model-template.md     ← blank worksheet for participants
@@ -52,7 +53,7 @@ threat-modeling-workshop/
 1. Read [`scenario/device-overview.md`](scenario/device-overview.md) to understand the device you will be threat modeling.
 2. Review [`scenario/system-architecture.md`](scenario/system-architecture.md) — study the components and data flows.
 3. Open [`templates/threat-model-template.md`](templates/threat-model-template.md) — this is your working document. Fill it in as you go through the workshop steps.
-4. Follow the steps in `workshop/01-scoping.md` → `05-documentation.md` as guided by the facilitator.
+4. Follow the four questions in `workshop/q1-what-are-we-working-on.md` → `q4-did-we-do-a-good-job.md` as guided by the facilitator.
 5. At the end, submit your completed template as instructed — it will be evaluated by an AI model for feedback.
 
 If you get stuck, check [`templates/example-filled-template.md`](templates/example-filled-template.md) for a reference example.

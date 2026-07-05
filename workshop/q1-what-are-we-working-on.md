@@ -1,14 +1,14 @@
-# 01 — Step 1: Scope & System Decomposition
+# Q1 — What are we working on?
 
 ## Goal
 
-Define the boundaries of your threat model. A threat model is only as good as the system it describes. If you scope too narrowly, you'll miss attack vectors. If you scope too broadly, you'll never finish.
+Define the boundaries of your threat model. A threat model is only as good as the system it describes. Scope too narrowly and you'll miss attack vectors. Scope too broadly and you'll never finish.
 
 ---
 
 ## What to do in this step
 
-Work through the following four activities and fill in the corresponding sections of your template.
+Work through the following four activities and fill in **Q1** of your template.
 
 ---
 
@@ -38,13 +38,13 @@ Assets are what you're trying to protect. In medical devices, assets include:
 | **Clinical integrity** | Accuracy of AI output, unaltered images |
 | **Credentials / keys** | Admin passwords, TLS certificates, API keys |
 
-List the assets specific to NeuroScan 3000 in your template. For each asset, note its **sensitivity** (Confidentiality, Integrity, Availability — pick the most critical property).
+List the assets specific to NeuroScan 3000 in your template. For each asset, note its **most critical security property** (Confidentiality, Integrity, or Availability).
 
 ---
 
 ### 1.3 Identify entry points and trust boundaries
 
-Entry points are interfaces where data or commands enter the system. Trust boundaries are lines where trust level changes.
+Entry points are interfaces where data or commands enter the system. Trust boundaries are lines where the trust level changes.
 
 Use the architecture diagram in [`../scenario/system-architecture.md`](../scenario/system-architecture.md) to identify:
 - Network interfaces (ports, protocols)
@@ -62,6 +62,7 @@ For each entry point, note: Who can reach it? Is authentication required? Is tra
 - Radiologist, neurologist, biomedical engineer, hospital IT admin, MediScanTech support, MediScanTech engineer
 
 **Threat actors** to consider:
+
 | Actor | Motivation | Access vector |
 |-------|-----------|--------------|
 | External attacker | Financial (ransomware), espionage | Internet, phishing |
@@ -73,7 +74,7 @@ For each entry point, note: Who can reach it? Is authentication required? Is tra
 
 ## Template section to fill in
 
-Open [`../templates/threat-model-template.md`](../templates/threat-model-template.md) and complete **Section 1: Scope**.
+Open [`../templates/threat-model-template.md`](../templates/threat-model-template.md) and complete **Q1: What are we working on?**
 
 ---
 

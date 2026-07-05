@@ -1,24 +1,8 @@
-# 05 — Step 5: Documentation & Review
+# Q4 — Did we do a good job?
 
 ## Goal
 
-A threat model only has value if it is communicated clearly and kept up to date. This step covers finalizing your template, reviewing as a group, and understanding how threat models are maintained in practice.
-
----
-
-## What a complete threat model document contains
-
-| Section | What it answers |
-|---------|----------------|
-| **System overview** | What is the device? What does it do? Who uses it? |
-| **Scope** | What's in and out? What are the trust boundaries? |
-| **Assets** | What are we protecting and why? |
-| **Threat actors** | Who might attack this and with what motivation? |
-| **Threats** | What can go wrong? (structured threat statements) |
-| **Risk assessment** | How likely and how bad is each threat? |
-| **Mitigations** | What are we doing about each threat? |
-| **Residual risk** | What risk remains after mitigations? |
-| **Review history** | When was this reviewed and what changed? |
+A threat model only has value if it is complete, clearly communicated, and kept up to date. This step is about reviewing your own work critically — and understanding how to validate threat models in practice.
 
 ---
 
@@ -34,6 +18,21 @@ Before submitting, review your completed template against this checklist:
 - [ ] Every Medium-risk threat has a mitigation or acceptance rationale
 - [ ] Every mitigation references at least one threat ID
 - [ ] Residual risk is noted for each mitigation
+
+---
+
+## What a complete threat model covers
+
+| Section | What it answers |
+|---------|----------------|
+| **System overview** | What is the device? What does it do? Who uses it? |
+| **Scope** | What's in and out? What are the trust boundaries? |
+| **Assets** | What are we protecting and why? |
+| **Threat actors** | Who might attack this and with what motivation? |
+| **Threats** | What can go wrong? (structured threat statements) |
+| **Risk assessment** | How likely and how bad is each threat? |
+| **Mitigations** | What are we doing about each threat? |
+| **Residual risk** | What risk remains after mitigations? |
 
 ---
 
