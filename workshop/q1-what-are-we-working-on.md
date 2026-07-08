@@ -1,5 +1,15 @@
 # Q1 — What are we working on?
 
+## Facilitator intro (3 min)
+
+> Read or paraphrase the following to the group before they start working.
+
+"Before we can find threats, we need to agree on what we're actually protecting. This first question is about building a shared map of the system — the components, the data, where it flows, and who's involved. Without this, different people in your group will be thinking about different things.
+
+We're going to identify: what are the valuable assets in this system, where are the doors in and out, and who might want to cause harm. Don't worry about being perfect — you can always refine as you go."
+
+---
+
 ## Goal
 
 Define the boundaries of your threat model. A threat model is only as good as the system it describes. Scope too narrowly and you'll miss attack vectors. Scope too broadly and you'll never finish.

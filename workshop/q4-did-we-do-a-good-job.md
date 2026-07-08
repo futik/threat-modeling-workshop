@@ -1,5 +1,15 @@
 # Q4 — Did we do a good job?
 
+## Facilitator intro (2 min)
+
+> Read or paraphrase the following to the group before they start working.
+
+"The last question is about stepping back and reviewing your own work. A threat model is only useful if it's honest — it shouldn't just list the obvious threats and call it done.
+
+Use the checklist in your template to make sure nothing is missing. Then each group will present their top findings — not to compete, but to find gaps. The best outcome is that another group spots something you missed."
+
+---
+
 ## Goal
 
 A threat model only has value if it is complete, clearly communicated, and kept up to date. This step is about reviewing your own work critically — and understanding how to validate threat models in practice.

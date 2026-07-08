@@ -1,5 +1,17 @@
 # Q3 — What are we going to do about it?
 
+## Facilitator intro (3 min)
+
+> Read or paraphrase the following to the group before they start working.
+
+"Now that we know what can go wrong, we need to decide what to do about it. Not everything needs to be fixed — sometimes the risk is low enough to accept, or there's simply no feasible fix. What matters is that you make a *conscious* decision and document it.
+
+For each high-priority threat, define at least one concrete mitigation. Be specific — 'add encryption' is not a mitigation; 'enable TLS on the DICOM connection between the workstation and the local server' is.
+
+Also keep in mind: this is a medical device. Some mitigations might require a new regulatory submission, or might create new risks for clinicians in an emergency. Those trade-offs are worth discussing."
+
+---
+
 ## Goal
 
 For each High and Medium priority threat from Q2, define one or more mitigations. Mitigations reduce either likelihood (make it harder to exploit) or impact (limit damage if exploited).

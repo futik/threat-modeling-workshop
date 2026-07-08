@@ -1,125 +1,110 @@
 # Q2 — What can go wrong?
 
-## Goal
+## Facilitator intro (5 min)
 
-Systematically enumerate threats and assess their risk. This step has two parts that flow together:
+> Read or paraphrase the following to the group before they start working.
 
-1. **Threat identification** — enumerate what can go wrong using structured techniques
-2. **Risk assessment** — prioritize each threat by estimating likelihood and impact
+"Now that we know what we're working on, we need to think like attackers. We're going to use a technique called **Attacker Stories** — it's like user stories in agile, but written from the perspective of someone who wants to cause harm.
 
-Use both in sequence: identify a threat, then score it before moving to the next. Or identify all threats first, then score — whichever works better for your group.
+The format is simple:
 
----
+> *As a [bad actor], I want to [do something bad] via [method or entry point], so that [I can achieve my goal].*
 
-## Part A: Threat Identification
-
-### Technique A1: STRIDE
-
-STRIDE is a mnemonic for six threat categories. Apply each category to every component and data flow you identified in Q1.
-
-| Letter | Threat | Violated property | Question to ask |
-|--------|--------|-----------------|----------------|
-| **S** | Spoofing | Authentication | Can an attacker impersonate a legitimate user or component? |
-| **T** | Tampering | Integrity | Can an attacker modify data, firmware, or software? |
-| **R** | Repudiation | Non-repudiation | Can a user deny having performed an action? |
-| **I** | Information disclosure | Confidentiality | Can an attacker read data they shouldn't? |
-| **D** | Denial of service | Availability | Can an attacker disrupt system operation? |
-| **E** | Elevation of privilege | Authorization | Can an attacker gain capabilities beyond their role? |
-
-**How to apply STRIDE:** for each data flow and component in the architecture, ask each STRIDE question. If the answer is "yes" or "possibly", write it as a candidate threat. Don't filter at this stage — capture everything.
-
-**Example (Acquisition Workstation → Cloud AI Service):**
-- S: Can an attacker spoof the cloud AI endpoint (DNS hijack, MITM)?
-- T: Can an attacker tamper with DICOM images in transit or at rest in the cloud?
-- I: Does the cloud store images that could be re-identified despite anonymization?
-- D: Can the cloud AI service be flooded, preventing diagnostic annotations from returning?
-- E: Can a compromised workstation gain elevated access to the cloud backend?
+You don't need to know the technical details perfectly. Think about what a bad actor would *want* — and then work backwards to how they might get it. Once you have your stories, you'll quickly score each one by likelihood and impact."
 
 ---
 
-### Technique A2: MITRE ATT&CK for ICS
+## Part A: Attacker Stories
 
-[MITRE ATT&CK for ICS](https://attack.mitre.org/matrices/ics/) catalogs adversary tactics and techniques observed in attacks on industrial and medical control systems.
+### Who are your bad actors?
 
-Relevant tactic areas for NeuroScan 3000:
+Pick from this list — or invent your own:
 
-| Tactic | Relevant to NeuroScan 3000 |
-|--------|---------------------------|
-| **Initial Access** | Spear phishing hospital staff, exploiting remote access (VPN/SSH), supply chain compromise of firmware |
-| **Execution** | Malicious firmware update, scripting via admin console |
-| **Persistence** | Backdoor in firmware, scheduled task on acquisition workstation |
-| **Lateral Movement** | Pivot from hospital LAN to DICOM server, to workstation |
-| **Collection** | Exfiltrate DICOM images, intercept HL7 FHIR patient data |
-| **Impact** | Inhibit response functions (prevent scanning), manipulate AI output (return falsified annotations), ransomware on workstation |
-
-Browse the [ICS matrix](https://attack.mitre.org/matrices/ics/) focusing on techniques relevant to healthcare. Map ATT&CK techniques to the STRIDE threats you already found — or use them to discover threats you missed.
+| Bad actor | Motivation | Likely access |
+|-----------|-----------|--------------|
+| **Ransomware group** | Financial — encrypt systems, demand payment | Internet, hospital phishing |
+| **Disgruntled employee** | Sabotage or revenge | Direct LAN access, insider knowledge |
+| **Nation-state actor** | Healthcare disruption, intelligence gathering | Supply chain, internet |
+| **Opportunistic hacker** | Curiosity, reputation, opportunistic data theft | Internet, hospital Wi-Fi |
+| **Rogue vendor technician** | Access beyond their role, financial gain | Remote support channel |
 
 ---
 
-### Threat statement format
+### Prompts to get started
 
-Write each threat as a structured statement:
+Use these to spark ideas. Apply each prompt to the NeuroScan 3000:
 
-> **[Threat actor]** can **[action]** the **[asset/component]** via **[entry point/interface]**, causing **[impact]**.
+- "What if someone intercepted the scan images in transit?"
+- "What if someone changed the AI diagnostic results before the radiologist saw them?"
+- "What if someone locked the device so it couldn't perform scans?"
+- "What if someone used the remote support channel to get into the system?"
+- "What if someone pushed a malicious software update?"
+- "What if someone got into the admin console?"
+- "What if the anonymisation of images didn't actually work?"
+- "What if someone on the hospital network could read images they shouldn't?"
 
-Example:
-> An external attacker can tamper with anonymized DICOM images in the cloud AI service via a compromised MediScanTech engineer account, causing the AI to return falsified diagnostic annotations that mislead the radiologist.
+---
+
+### Attacker story format
+
+Write each story as:
+
+> **As a** [bad actor], **I want to** [do something bad] **via** [method or entry point], **so that** [I achieve my goal].
+
+**Example:**
+> As a ransomware group, I want to encrypt the acquisition workstation via a phishing email to a hospital employee, so that the hospital cannot perform scans and is forced to pay a ransom.
+
+**Another example:**
+> As a rogue vendor technician, I want to modify the AI diagnostic model via the remote support channel, so that the system returns false negatives and patients are misdiagnosed.
+
+Aim for at least **8 stories** across different parts of the system. Fill them into the template.
 
 ---
 
 ## Part B: Risk Assessment
 
-Not all threats are equal. Score each threat on **likelihood** and **impact**, then apply a patient safety check.
+Once you have your stories, score each one. You don't need to be precise — use your best judgement as a group.
 
 ### Likelihood
 
-| Score | Level | Description |
-|-------|-------|-------------|
-| 1 | Low | Requires significant skill, rare opportunity, or physical access |
-| 2 | Medium | Exploitable remotely with moderate skill; known vulnerability class |
-| 3 | High | Easy to exploit, widely known technique, or already exploited in the wild |
+| Score | Meaning |
+|-------|---------|
+| 1 — Low | Hard to pull off: needs special skill, rare opportunity, or physical access |
+| 2 — Medium | Realistic: exploitable remotely with moderate skill or a known weakness |
+| 3 — High | Easy: simple technique, widely known, or already happening in the wild |
 
 ### Impact
 
-| Score | Level | Description |
-|-------|-------|-------------|
-| 1 | Low | Minor inconvenience; no patient harm; quickly recoverable |
-| 2 | Medium | Significant disruption; possible data breach; delayed care |
-| 3 | High | Direct patient harm possible; serious data breach; device unavailable for hours+ |
+| Score | Meaning |
+|-------|---------|
+| 1 — Low | Minor inconvenience; no patient harm; quickly fixed |
+| 2 — Medium | Significant disruption or a data breach; care could be delayed |
+| 3 — High | Direct patient harm possible; serious breach; device down for hours or days |
 
 ### Risk score = Likelihood × Impact
 
-| Score | Risk level | Priority |
-|-------|-----------|---------|
-| 1–2 | Low | Accept or monitor |
-| 3–4 | Medium | Mitigate in next release |
-| 6–9 | High | Mitigate immediately / must-fix |
+| Score | Priority |
+|-------|---------|
+| 1–2 | Low — monitor |
+| 3–4 | Medium — plan a fix |
+| 6–9 | High — fix urgently |
 
-### Patient safety adjustment
+### Patient safety rule
 
-After scoring, apply a **safety override**: if a threat can plausibly lead to direct patient harm (wrong diagnosis acted upon, device delivers incorrect therapy, scan unavailable during emergency), **escalate the risk level to High** regardless of the matrix score. Document your reasoning.
-
-### Example
-
-| # | Threat | Likelihood | Impact | Score | Safety override | Priority |
-|---|--------|-----------|--------|-------|----------------|---------|
-| T-04 | Attacker modifies AI annotations via compromised cloud account | 2 | 3 | 6 | Yes — misdiagnosis could harm patient | **High** |
-| T-07 | DoS on cloud AI service via API flooding | 2 | 2 | 4 | No — fallback to radiologist unaided review | **Medium** |
-| T-11 | Re-identification of "anonymized" images in cloud storage | 1 | 3 | 3 | No | **Medium** |
+After scoring, ask: *"Could this threat directly harm a patient?"* — wrong diagnosis acted on, scan unavailable during an emergency, incorrect therapy delivered. If yes, **mark it High priority regardless of the score** and note your reasoning.
 
 ---
 
 ## Template section to fill in
 
-Open [`../templates/threat-model-template.md`](../templates/threat-model-template.md) and complete **Q2: What can go wrong?**
-
-Aim for at least **10 distinct threat statements** across different components and data flows. Score all of them.
+Complete **Q2** in your template:
+- **Q2.1** — write your attacker stories (aim for at least 8)
+- **Q2.2** — score each story for likelihood and impact
 
 ---
 
 ## Discussion questions
 
-1. Which STRIDE category is hardest to address in a regulated medical device environment? Why?
-2. The AI model's outputs are not explainable. What threats does this create that wouldn't exist in a rule-based system?
-3. Two threats have the same score — one affects patient safety, the other affects data privacy. How do you prioritize?
-4. Are there threats that are High impact but you'd accept rather than mitigate? Why?
+1. Which story surprised you most? Why?
+2. Which story would be hardest to defend against — and why?
+3. If you could only fix one thing on this device today, what would it be?
