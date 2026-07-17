@@ -42,6 +42,29 @@ function numCircle(slide, x, y, n, d, fill) {
   });
 }
 
+// Reference slide: worked example (left) + FDA expectations (right).
+// Meant to be left on screen while groups work the question.
+function refSlide(num, titleText, exHead, exItems, fdaItems) {
+  const sl = p.addSlide(); bg(sl, LIGHT);
+  kicker(sl, "Q" + num + " reference · leave this up while you work");
+  title(sl, titleText);
+  const top = 1.68, bh = 5.15;
+  // left — worked example
+  const lx = 0.6, lw = 6.0;
+  sl.addShape(p.ShapeType.roundRect, { x: lx, y: top, w: lw, h: bh, rectRadius: 0.08, fill: { color: SOFT } });
+  sl.addText(exHead, { x: lx + 0.3, y: top + 0.24, w: lw - 0.6, h: 0.5, fontFace: HEAD, bold: true, fontSize: 18, color: TEAL, margin: 0 });
+  sl.addText(exItems.map((t) => ({ text: t, options: { bullet: { code: "2022", indent: 16 }, breakLine: true, paraSpaceAfter: 10 } })),
+    { x: lx + 0.32, y: top + 0.9, w: lw - 0.62, h: bh - 1.15, fontFace: BODY, fontSize: 13.5, color: INK, margin: 0, valign: "top" });
+  // right — FDA expectations
+  const rx = 6.95, rw = 5.78;
+  sl.addShape(p.ShapeType.roundRect, { x: rx, y: top, w: rw, h: bh, rectRadius: 0.08, fill: { color: "F0F5F9" }, line: { color: PRIMARY, width: 1.25 } });
+  sl.addShape(p.ShapeType.ellipse, { x: rx + 0.3, y: top + 0.27, w: 0.42, h: 0.42, fill: { color: PRIMARY } });
+  sl.addText("What the FDA expects", { x: rx + 0.85, y: top + 0.24, w: rw - 1.1, h: 0.45, fontFace: HEAD, bold: true, fontSize: 18, color: PRIMARY, valign: "middle", margin: 0 });
+  sl.addText(fdaItems.map((t) => ({ text: t, options: { bullet: { code: "2022", indent: 16 }, breakLine: true, paraSpaceAfter: 11 } })),
+    { x: rx + 0.32, y: top + 0.95, w: rw - 0.64, h: bh - 1.2, fontFace: BODY, fontSize: 13.5, color: INK, margin: 0, valign: "top" });
+  return sl;
+}
+
 // ---------------------------------------------------------------- 1. TITLE
 let s = p.addSlide(); bg(s, DARK);
 s.addShape(p.ShapeType.ellipse, { x: 10.6, y: -1.7, w: 4.6, h: 4.6, fill: { color: "0E3A55" } });
@@ -223,6 +246,22 @@ questionSlide("1", "What are we working on?",
     "Name the threat actors — insiders, ransomware, nation-states, vendors.",
   ]);
 
+// -------------------------------------------------- Q1 reference (example + FDA)
+refSlide("1", "Q1 · Example & what the FDA expects",
+  "Worked example — scope",
+  [
+    "In scope: imaging unit + firmware, acquisition workstation, local DICOM server, cloud AI service, update delivery",
+    "Out of scope: hospital EMR (partially trusted); hospital network (threat boundary)",
+    "Asset A-01: patient DICOM images (PHI) — Confidentiality + Integrity",
+    "Entry point: remote support (VPN + SSH, shared credential) — HIGH RISK",
+  ],
+  [
+    "Scope the whole medical device system — device + cloud + interoperable parts (§V.A.3)",
+    "Capture third-party / COTS components now — they become your SBOM (§524B(b)(3))",
+    "Give assets & entry points stable IDs — the anchor for later traceability",
+    "Red flag: a boundary drawn around the device only, ignoring the cloud service",
+  ]);
+
 // ---------------------------------------------------------------- 9. Q2 story format
 s = p.addSlide(); bg(s, DARK);
 numCircle(s, 0.7, 0.6, "2", 0.95, MINT);
@@ -282,6 +321,22 @@ s.addText("If a story could directly harm a patient — wrong diagnosis acted on
   x: 0.9, y: 5.15, w: 11.5, h: 0.8, fontFace: BODY, fontSize: 15.5, color: "7A2E2E", margin: 0,
 });
 
+// -------------------------------------------------- Q2 reference (example + FDA)
+refSlide("2", "Q2 · Example & what the FDA expects",
+  "Worked example — a scored threat",
+  [
+    "T-04 (Elevation of privilege): brute-force the no-MFA admin console on the hospital LAN → full workstation control",
+    "Likelihood 3 (no MFA, no rate-limit) × Impact 3 (full compromise) = 9",
+    "Patient-safety override: Yes → High",
+    "Rationale is about exploitability — how feasible — not the odds of an attack",
+  ],
+  [
+    "Judge security risk on exploitability, not probability — not the ISO 14971 approach",
+    "Keep a severity-of-patient-harm axis → a controlled / uncontrolled call",
+    "A patient-safety override can outrank the numeric score",
+    "Cybersecurity risk scales independently of software / safety risk",
+  ]);
+
 // ---------------------------------------------------------------- 11. Q3
 questionSlide("3", "What are we going to do about it?",
   "For each high-priority threat, define at least one concrete mitigation.",
@@ -292,6 +347,22 @@ questionSlide("3", "What are we going to do about it?",
     "Flag regulatory impact — could a change need a new FDA submission?",
   ]);
 
+// -------------------------------------------------- Q3 reference (example + FDA)
+refSlide("3", "Q3 · Example & what the FDA expects",
+  "Worked example — a mitigation",
+  [
+    "M-01 addresses T-04 & T-07 — type: Preventive",
+    "Enforce TOTP MFA on the admin console; replace the shared support credential with per-engineer PKI certs; rate-limit logins",
+    "Residual risk: credential theft still possible if the device is already compromised",
+    "Regulatory note: software change only — likely no new clearance",
+  ],
+  [
+    "The risk assessment consumes the threat model; controls are evaluated against threats (§V.A.2)",
+    "Record pre- and post-mitigation (residual) risk, with acceptance criteria",
+    "Don't let a security control create a new safety risk — the safety ↔ security interface",
+    "Document the scoring method, not just the numbers",
+  ]);
+
 // ---------------------------------------------------------------- 12. Q4
 questionSlide("4", "Did we do a good job?",
   "A threat model only has value if it's honest and complete.",
@@ -300,6 +371,22 @@ questionSlide("4", "Did we do a good job?",
     "Present your top 3 threats, your most surprising find, your hardest trade-off.",
     "Other groups: ask \"did you consider…?\" — the goal is to find gaps.",
     "The best outcome is another group spotting something you missed.",
+  ]);
+
+// -------------------------------------------------- Q4 reference (example + FDA)
+refSlide("4", "Q4 · Example & what the FDA expects",
+  "Worked example — review & lifecycle",
+  [
+    "Top-3 risks named; most-surprising = T-09 (rogue insider alters the AI model)",
+    "Hardest trade-off: fixing T-01 properly needs secure boot → a new 510(k)",
+    "Open question logged: SLA to rotate the shared support credential?",
+    "Model kept in version control so every change is diffable",
+  ],
+  [
+    "Maintain the model across the whole lifecycle — \"maintain\" is statutory (§524B(b)(2))",
+    "Re-trigger on: new feature, new interface, a disclosed vulnerability, an incident",
+    "Show end-to-end traceability: threat model ↔ risk assessment ↔ SBOM ↔ testing",
+    "Assess per fielded version; track patch % and time-to-patch metrics",
   ]);
 
 // ---------------------------------------------------------------- 13. FDA reality
