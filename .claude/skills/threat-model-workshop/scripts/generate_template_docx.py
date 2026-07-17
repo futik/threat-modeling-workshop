@@ -167,25 +167,27 @@ def main():
 
     doc.add_heading("2.2 Risk assessment", level=3)
     p = doc.add_paragraph()
-    p.add_run("Likelihood: ").bold = True
-    p.add_run("1 = Hard · 2 = Realistic · 3 = Easy      ")
-    p.add_run("Impact: ").bold = True
-    p.add_run("1 = Minor · 2 = Significant · 3 = Serious")
+    p.add_run("Exploitability: ").bold = True
+    p.add_run("1 = Low (rare access / high skill) · 2 = Moderate (remote, known weakness) · "
+              "3 = High (trivial, public exploit)")
+    p1b = doc.add_paragraph()
+    p1b.add_run("Severity of patient harm: ").bold = True
+    p1b.add_run("1 = Minor · 2 = Significant · 3 = Serious")
     p2 = doc.add_paragraph()
-    p2.add_run("Risk = Likelihood × Impact  →  1–2: Low · 3–4: Medium · 6–9: High").bold = True
+    p2.add_run("Risk = Exploitability × Severity  →  1–2: Low · 3–4: Medium · 6–9: High").bold = True
     note = doc.add_paragraph()
     nr = note.add_run("Patient safety rule: if a story could directly harm a patient, mark it High "
                       "regardless of score and add a note.")
     nr.bold = True
     fda = doc.add_paragraph()
-    fr = fda.add_run("FDA note: real submissions reframe \"Likelihood\" as \"Exploitability\" (how "
-                     "feasible the attack is) — the FDA does not permit probabilistic scoring for "
-                     "security risk. We use Likelihood here for simplicity; the reasoning transfers.")
+    fr = fda.add_run("FDA note: security risk is scored on exploitability (how feasible the attack "
+                     "is), not probability — the FDA does not permit probabilistic scoring for "
+                     "security risk. Exploitability × severity is the FDA's controlled/uncontrolled matrix.")
     fr.italic = True
     fr.font.color.rgb = NOTE
     fr.font.size = Pt(10)
     add_table(doc,
-              ["Story ID", "Likelihood (1–3)", "Rationale", "Impact (1–3)", "Rationale",
+              ["Story ID", "Exploitability (1–3)", "Rationale", "Severity (1–3)", "Rationale",
                "Risk score", "Patient safety?", "Priority"],
               n_blank_rows=8)
 
@@ -225,7 +227,7 @@ def main():
     checklist = [
         "At least 8 attacker stories, each covering a different part of the system",
         "Every story written in the full format (actor → action → method → goal)",
-        "Every story has a likelihood, impact, and risk score",
+        "Every story has an exploitability, severity, and risk score",
         "Any story that could harm a patient is marked High priority with rationale",
         "Every High-priority story has at least one mitigation",
         "Every Medium-priority story has a mitigation or a documented acceptance rationale",

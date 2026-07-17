@@ -109,12 +109,12 @@ Write the format on the board or project it.
 - Common mistake: scoring everything 3×3 because "it's a medical device" — push for differentiation
 - If no patient safety flags: *"Which of your stories, if it happened, could mean a patient got the wrong diagnosis and was treated for the wrong condition?"*
 
-**FDA lens — exploitability, not probability (say this out loud).** This is the most FDA-sensitive step. We keep the workshop's **Likelihood × Impact** scoring because it's the fastest way to get a mixed audience thinking about risk — *but state the gap*, because the gap is the lesson:
+**FDA lens — exploitability, not probability (say this out loud).** This is the most FDA-sensitive step, and the template scores it the FDA way: **Exploitability × Severity of patient harm**, not Likelihood × Impact. Make the reason explicit:
 
-> *"Today we score Likelihood × Impact. In a real FDA submission you must reframe the first axis as **Exploitability** — how feasible is it to exploit this? — not how probable an attack is. The FDA explicitly says security risk cannot be estimated probabilistically the way ISO 14971 does for safety; it 'focuses on exploitability.' Same table, more defensible meaning."*
+> *"We don't score how* likely *an attack is — you can't put odds on an adversary, and the FDA explicitly rejects probabilistic scoring for security risk. We score* exploitability*: how feasible is the attack — skill, access, is there a public exploit, is it reachable remotely?"*
 
-- Reframe "likelihood" reasoning as exploitability: attacker skill, access needed, whether a known exploit exists, remote vs. local.
-- The workshop's *"could this directly harm a patient? → mark High"* rule **is** the FDA severity-of-patient-harm axis. Combined, the two axes yield the FDA's 2016 **controlled / uncontrolled** determination.
+- The two axes — exploitability × severity of patient harm — are the FDA's 2016 **controlled / uncontrolled** risk matrix.
+- The *"could this directly harm a patient? → mark High"* rule is the **severity axis** doing its job.
 - Cybersecurity risk scales *independently* of software/safety risk — don't inherit safety scores.
 > *Reviewer red flag:* probabilistic language ("1-in-X chance", frequencies) — the classic security-risk deficiency.
 

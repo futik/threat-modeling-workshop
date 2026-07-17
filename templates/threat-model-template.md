@@ -126,13 +126,15 @@ Write each threat as an attacker story:
 
 Score each story. Use your judgement as a group — you don't need to be precise.
 
-**Likelihood:** 1 = Hard (special skill/access needed) · 2 = Realistic (moderate skill, known weakness) · 3 = Easy (simple, widely known)  
-**Impact:** 1 = Minor (no patient harm, quickly fixed) · 2 = Significant (disruption or data breach) · 3 = Serious (patient harm possible, major breach, device down)  
-**Risk = Likelihood × Impact** → 1–2: Low · 3–4: Medium · 6–9: High
+**Exploitability:** 1 = Low (needs rare access or high skill — physical access, privileged insider, zero-day) · 2 = Moderate (remotely exploitable with moderate skill or a known weakness) · 3 = High (trivial — default/no credentials, public exploit, reachable from the network)  
+**Severity of patient harm:** 1 = Minor (no patient harm, quickly fixed) · 2 = Significant (care delayed/degraded, or a data breach) · 3 = Serious (direct patient harm plausible — misdiagnosis acted on, device unavailable in an emergency)  
+**Risk = Exploitability × Severity** → 1–2: Low · 3–4: Medium · 6–9: High
+
+> **Why exploitability, not likelihood?** Security risk can't be estimated as a probability the way ISO 14971 safety risk is. The FDA expects security risk to be judged on *exploitability* — how feasible the attack is. Exploitability × severity is also the FDA's controlled/uncontrolled risk matrix.
 
 > **Patient safety rule:** If a story could directly harm a patient (wrong diagnosis acted on, device unavailable in emergency), mark it **High** regardless of the score and add a note.
 
-| Story ID | Likelihood (1–3) | Rationale | Impact (1–3) | Rationale | Risk score | Patient safety? | Priority |
+| Story ID | Exploitability (1–3) | Rationale | Severity (1–3) | Rationale | Risk score | Patient safety? | Priority |
 |----------|-----------------|-----------|-------------|-----------|-----------|----------------|---------|
 | S-01 | | | | | | | |
 | S-02 | | | | | | | |
@@ -208,7 +210,7 @@ Before submitting, confirm:
 
 - [ ] At least 8 attacker stories, each covering a different part of the system
 - [ ] Every story is written in the full format (actor → action → method → goal)
-- [ ] Every story has a likelihood score, impact score, and risk score
+- [ ] Every story has an exploitability score, severity score, and risk score
 - [ ] Any story that could harm a patient is marked High priority with a rationale
 - [ ] Every High-priority story has at least one mitigation
 - [ ] Every Medium-priority story has a mitigation or a documented reason for accepting the risk

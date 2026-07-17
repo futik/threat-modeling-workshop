@@ -85,7 +85,7 @@
 
 ## Section 3: Risk Assessment
 
-| Threat ID | Likelihood | Likelihood rationale | Impact | Impact rationale | Score | Safety override? | Priority |
+| Threat ID | Exploitability | Exploitability rationale | Severity | Severity rationale | Score | Safety override? | Priority |
 |-----------|-----------|---------------------|--------|-----------------|-------|----------------|---------|
 | T-01 | 2 | Requires compromising the update delivery pipeline — non-trivial but supply chain attacks are well-documented | 3 | Persistent firmware compromise gives attacker full control; could alter scan behavior | 6 | Yes — manipulated scans directly endanger patients | **High** |
 | T-02 | 2 | Spear phishing is common; cloud credential compromise is high-value target | 3 | AI annotation tampering could lead radiologist to misdiagnosis | 6 | Yes | **High** |

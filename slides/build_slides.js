@@ -289,31 +289,34 @@ s.addText("Aim for at least 8 stories across different parts of the system.", {
 s = p.addSlide(); bg(s, LIGHT);
 kicker(s, "Q2 · continued");
 title(s, "Then score each story");
-s.addShape(p.ShapeType.roundRect, { x: 0.6, y: 1.7, w: 3.9, h: 2.5, rectRadius: 0.09, fill: { color: SOFT } });
-s.addText("Likelihood", { x: 0.8, y: 1.85, w: 3.5, h: 0.5, fontFace: HEAD, bold: true, fontSize: 20, color: TEAL, margin: 0 });
+s.addShape(p.ShapeType.roundRect, { x: 0.6, y: 1.7, w: 3.9, h: 2.55, rectRadius: 0.09, fill: { color: SOFT } });
+s.addText("Exploitability", { x: 0.8, y: 1.82, w: 3.5, h: 0.4, fontFace: HEAD, bold: true, fontSize: 19, color: TEAL, margin: 0 });
+s.addText("how feasible is the attack?", { x: 0.8, y: 2.2, w: 3.5, h: 0.3, fontFace: BODY, italic: true, fontSize: 12, color: MUTE, margin: 0 });
 s.addText([
-  { text: "1  Hard", options: { breakLine: true, paraSpaceAfter: 6 } },
-  { text: "2  Realistic", options: { breakLine: true, paraSpaceAfter: 6 } },
-  { text: "3  Easy", options: {} },
-], { x: 0.8, y: 2.45, w: 3.5, h: 1.6, fontFace: BODY, fontSize: 16, color: INK, margin: 0 });
+  { text: "1  Low — rare access / high skill", options: { breakLine: true, paraSpaceAfter: 5 } },
+  { text: "2  Moderate — remote, known flaw", options: { breakLine: true, paraSpaceAfter: 5 } },
+  { text: "3  High — trivial, public exploit", options: {} },
+], { x: 0.8, y: 2.6, w: 3.55, h: 1.55, fontFace: BODY, fontSize: 13, color: INK, margin: 0 });
 
-s.addText("×", { x: 4.55, y: 2.4, w: 0.6, h: 1.0, align: "center", valign: "middle", fontFace: HEAD, fontSize: 40, bold: true, color: MUTE, margin: 0 });
+s.addText("×", { x: 4.55, y: 2.45, w: 0.6, h: 1.0, align: "center", valign: "middle", fontFace: HEAD, fontSize: 40, bold: true, color: MUTE, margin: 0 });
 
-s.addShape(p.ShapeType.roundRect, { x: 5.2, y: 1.7, w: 3.9, h: 2.5, rectRadius: 0.09, fill: { color: SOFT } });
-s.addText("Impact", { x: 5.4, y: 1.85, w: 3.5, h: 0.5, fontFace: HEAD, bold: true, fontSize: 20, color: TEAL, margin: 0 });
+s.addShape(p.ShapeType.roundRect, { x: 5.2, y: 1.7, w: 3.9, h: 2.55, rectRadius: 0.09, fill: { color: SOFT } });
+s.addText("Severity", { x: 5.4, y: 1.82, w: 3.5, h: 0.4, fontFace: HEAD, bold: true, fontSize: 19, color: TEAL, margin: 0 });
+s.addText("of patient harm", { x: 5.4, y: 2.2, w: 3.5, h: 0.3, fontFace: BODY, italic: true, fontSize: 12, color: MUTE, margin: 0 });
 s.addText([
-  { text: "1  Minor", options: { breakLine: true, paraSpaceAfter: 6 } },
-  { text: "2  Significant", options: { breakLine: true, paraSpaceAfter: 6 } },
-  { text: "3  Serious", options: {} },
-], { x: 5.4, y: 2.45, w: 3.5, h: 1.6, fontFace: BODY, fontSize: 16, color: INK, margin: 0 });
+  { text: "1  Minor — no patient harm", options: { breakLine: true, paraSpaceAfter: 5 } },
+  { text: "2  Significant — care delayed / breach", options: { breakLine: true, paraSpaceAfter: 5 } },
+  { text: "3  Serious — direct patient harm", options: {} },
+], { x: 5.4, y: 2.6, w: 3.55, h: 1.55, fontFace: BODY, fontSize: 13, color: INK, margin: 0 });
 
-s.addShape(p.ShapeType.roundRect, { x: 9.5, y: 1.7, w: 3.2, h: 2.5, rectRadius: 0.09, fill: { color: PRIMARY } });
-s.addText("Risk", { x: 9.7, y: 1.85, w: 2.8, h: 0.5, fontFace: HEAD, bold: true, fontSize: 20, color: MINT, margin: 0 });
+s.addShape(p.ShapeType.roundRect, { x: 9.5, y: 1.7, w: 3.2, h: 2.55, rectRadius: 0.09, fill: { color: PRIMARY } });
+s.addText("Risk", { x: 9.7, y: 1.82, w: 2.8, h: 0.4, fontFace: HEAD, bold: true, fontSize: 19, color: MINT, margin: 0 });
+s.addText("exploitability × severity", { x: 9.7, y: 2.2, w: 2.8, h: 0.3, fontFace: BODY, italic: true, fontSize: 12, color: "9DC6D2", margin: 0 });
 s.addText([
-  { text: "1–2  Low", options: { breakLine: true, paraSpaceAfter: 6 } },
-  { text: "3–4  Medium", options: { breakLine: true, paraSpaceAfter: 6 } },
+  { text: "1–2  Low", options: { breakLine: true, paraSpaceAfter: 5 } },
+  { text: "3–4  Medium", options: { breakLine: true, paraSpaceAfter: 5 } },
   { text: "6–9  High", options: {} },
-], { x: 9.7, y: 2.45, w: 2.8, h: 1.6, fontFace: BODY, fontSize: 16, color: LIGHT, margin: 0 });
+], { x: 9.7, y: 2.6, w: 2.8, h: 1.55, fontFace: BODY, fontSize: 14, color: LIGHT, margin: 0 });
 
 s.addShape(p.ShapeType.roundRect, { x: 0.6, y: 4.55, w: 12.1, h: 1.5, rectRadius: 0.1, fill: { color: "FDECEC" }, line: { color: "E5A6A6", width: 1 } });
 s.addText("Patient safety rule", { x: 0.9, y: 4.7, w: 11.5, h: 0.45, fontFace: HEAD, bold: true, fontSize: 18, color: "B23A3A", margin: 0 });
@@ -326,7 +329,7 @@ refSlide("2", "Q2 · Example & what the FDA expects",
   "Worked example — a scored threat",
   [
     "T-04 (Elevation of privilege): brute-force the no-MFA admin console on the hospital LAN → full workstation control",
-    "Likelihood 3 (no MFA, no rate-limit) × Impact 3 (full compromise) = 9",
+    "Exploitability 3 (no MFA, no rate-limit) × Severity 3 (full compromise) = 9",
     "Patient-safety override: Yes → High",
     "Rationale is about exploitability — how feasible — not the odds of an attack",
   ],

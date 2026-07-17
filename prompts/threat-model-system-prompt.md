@@ -52,10 +52,10 @@ For each threat:
 Identify at least 15 distinct threats covering different components and STRIDE categories.
 
 ## 6. Risk Assessment
-For each threat:
-- Likelihood (1=Low, 2=Medium, 3=High) with one-sentence rationale
-- Impact (1=Low, 2=Medium, 3=High) with one-sentence rationale
-- Risk score (L × I)
+Security risk is assessed on exploitability, not probability (do not score the likelihood of an attack the ISO 14971 probabilistic way). For each threat:
+- Exploitability (1=Low: rare access/high skill; 2=Moderate: remote, known weakness; 3=High: trivial, public exploit) with one-sentence rationale
+- Severity of patient harm (1=Minor, 2=Significant, 3=Serious) with one-sentence rationale
+- Risk score (Exploitability × Severity)
 - Patient safety override: Yes/No with rationale if Yes
 - Priority (Low/Medium/High)
 

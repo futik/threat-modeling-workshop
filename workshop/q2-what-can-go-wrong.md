@@ -51,23 +51,25 @@ Aim for at least **8 stories** across different parts of the system. Fill them i
 
 Once you have your stories, score each one. You don't need to be precise — use your best judgement as a group.
 
-### Likelihood
+> **Why exploitability, not likelihood?** Security risk can't be estimated as a probability the way ISO 14971 safety risk is — you can't put odds on an adversary. The FDA expects security risk to be judged on **exploitability**: how feasible the attack is. Exploitability × severity of patient harm is also the FDA's controlled/uncontrolled risk matrix.
+
+### Exploitability — how feasible is the attack?
 
 | Score | Meaning |
 |-------|---------|
-| 1 — Low | Hard to pull off: needs special skill, rare opportunity, or physical access |
-| 2 — Medium | Realistic: exploitable remotely with moderate skill or a known weakness |
-| 3 — High | Easy: simple technique, widely known, or already happening in the wild |
+| 1 — Low | Needs rare access or high skill: physical access, a privileged insider, or a zero-day |
+| 2 — Moderate | Remotely exploitable with moderate skill, or a known/published weakness |
+| 3 — High | Trivial: default or no credentials, a public exploit, reachable from the network |
 
-### Impact
+### Severity of patient harm
 
 | Score | Meaning |
 |-------|---------|
-| 1 — Low | Minor inconvenience; no patient harm; quickly fixed |
-| 2 — Medium | Significant disruption or a data breach; care could be delayed |
-| 3 — High | Direct patient harm possible; serious breach; device down for hours or days |
+| 1 — Minor | No patient harm; minor inconvenience; quickly fixed |
+| 2 — Significant | Care delayed or degraded, or a data breach |
+| 3 — Serious | Direct patient harm plausible; serious breach; device down for hours or days |
 
-### Risk score = Likelihood × Impact
+### Risk score = Exploitability × Severity
 
 | Score | Priority |
 |-------|---------|
@@ -85,7 +87,7 @@ After scoring, ask: *"Could this threat directly harm a patient?"* — wrong dia
 
 Complete **Q2** in your template:
 - **Q2.1** — write your attacker stories (aim for at least 8)
-- **Q2.2** — score each story for likelihood and impact
+- **Q2.2** — score each story for exploitability and severity
 
 ---
 

@@ -49,9 +49,9 @@ Score each dimension from 1 to 5:
 - 1: Threats are generic, vague, or do not reference the system architecture
 
 ### 4. Risk assessment accuracy (1–5)
-- 5: Risk scores are well-reasoned; patient safety overrides applied correctly; prioritization is defensible
+- 5: Scores are exploitability-based (not probabilistic), well-reasoned; patient-safety/severity overrides applied correctly; prioritization is defensible
 - 3: Most scores reasonable; 1–2 clear under- or over-estimations; some missing patient safety overrides
-- 1: Risk scores appear arbitrary; significant patient safety overrides missing
+- 1: Risk scores appear arbitrary or framed as attack probability; significant patient safety overrides missing
 
 ### 5. Mitigation quality (1–5)
 - 5: Mitigations are specific, actionable, address root cause, note residual risk, and acknowledge regulatory implications where relevant
