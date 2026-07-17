@@ -282,7 +282,10 @@ s.addText("Example: As a rogue vendor technician, I want to change the AI model 
   x: 0.9, y: 4.65, w: 11.5, h: 1.1, fontFace: BODY, fontSize: 16, italic: true, color: "CDE3EA", margin: 0,
 });
 s.addText("Aim for at least 8 stories across different parts of the system.", {
-  x: 0.9, y: 5.95, w: 11.5, h: 0.5, fontFace: BODY, bold: true, fontSize: 16, color: MINT, margin: 0,
+  x: 0.9, y: 5.9, w: 11.5, h: 0.4, fontFace: BODY, bold: true, fontSize: 16, color: MINT, margin: 0,
+});
+s.addText("Tag each story's impact type — S = patient safety · P = privacy/PHI · A = availability.", {
+  x: 0.9, y: 6.35, w: 11.5, h: 0.4, fontFace: BODY, italic: true, fontSize: 14, color: "9FC3D0", margin: 0,
 });
 
 // ---------------------------------------------------------------- 10. Q2 scoring
@@ -301,12 +304,12 @@ s.addText([
 s.addText("×", { x: 4.55, y: 2.45, w: 0.6, h: 1.0, align: "center", valign: "middle", fontFace: HEAD, fontSize: 40, bold: true, color: MUTE, margin: 0 });
 
 s.addShape(p.ShapeType.roundRect, { x: 5.2, y: 1.7, w: 3.9, h: 2.55, rectRadius: 0.09, fill: { color: SOFT } });
-s.addText("Severity", { x: 5.4, y: 1.82, w: 3.5, h: 0.4, fontFace: HEAD, bold: true, fontSize: 19, color: TEAL, margin: 0 });
-s.addText("of patient harm", { x: 5.4, y: 2.2, w: 3.5, h: 0.3, fontFace: BODY, italic: true, fontSize: 12, color: MUTE, margin: 0 });
+s.addText("Severity of harm", { x: 5.4, y: 1.82, w: 3.5, h: 0.4, fontFace: HEAD, bold: true, fontSize: 19, color: TEAL, margin: 0 });
+s.addText("safety · privacy · availability", { x: 5.4, y: 2.2, w: 3.5, h: 0.3, fontFace: BODY, italic: true, fontSize: 12, color: MUTE, margin: 0 });
 s.addText([
-  { text: "1  Minor — no patient harm", options: { breakLine: true, paraSpaceAfter: 5 } },
-  { text: "2  Significant — care delayed / breach", options: { breakLine: true, paraSpaceAfter: 5 } },
-  { text: "3  Serious — direct patient harm", options: {} },
+  { text: "1  Minor — no real harm", options: { breakLine: true, paraSpaceAfter: 5 } },
+  { text: "2  Significant — delay, breach, downtime", options: { breakLine: true, paraSpaceAfter: 5 } },
+  { text: "3  Serious — patient harm or major breach", options: {} },
 ], { x: 5.4, y: 2.6, w: 3.55, h: 1.55, fontFace: BODY, fontSize: 13, color: INK, margin: 0 });
 
 s.addShape(p.ShapeType.roundRect, { x: 9.5, y: 1.7, w: 3.2, h: 2.55, rectRadius: 0.09, fill: { color: PRIMARY } });
@@ -322,6 +325,9 @@ s.addShape(p.ShapeType.roundRect, { x: 0.6, y: 4.55, w: 12.1, h: 1.5, rectRadius
 s.addText("Patient safety rule", { x: 0.9, y: 4.7, w: 11.5, h: 0.45, fontFace: HEAD, bold: true, fontSize: 18, color: "B23A3A", margin: 0 });
 s.addText("If a story could directly harm a patient — wrong diagnosis acted on, device down in an emergency — mark it HIGH regardless of the score, and note why.", {
   x: 0.9, y: 5.15, w: 11.5, h: 0.8, fontFace: BODY, fontSize: 15.5, color: "7A2E2E", margin: 0,
+});
+s.addText("In a real engagement, teams layer STRIDE (systematic threat enumeration) and CVSS (standardized scoring, adapted for patient-safety severity) on top of this teaching scale.", {
+  x: 0.6, y: 6.35, w: 12.1, h: 0.6, fontFace: BODY, italic: true, fontSize: 13, color: MUTE, margin: 0,
 });
 
 // -------------------------------------------------- Q2 reference (example + FDA)

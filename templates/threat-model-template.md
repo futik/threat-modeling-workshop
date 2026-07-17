@@ -107,18 +107,20 @@ Write each threat as an attacker story:
 - What if someone got admin access via the local console?
 - What if the device was made unavailable during an emergency?
 
-| Story ID | Bad actor | Attacker story | Part of system affected |
-|----------|-----------|----------------|------------------------|
-| S-01 | | *As a ..., I want to ... via ..., so that ...* | |
-| S-02 | | | |
-| S-03 | | | |
-| S-04 | | | |
-| S-05 | | | |
-| S-06 | | | |
-| S-07 | | | |
-| S-08 | | | |
+| Story ID | Bad actor | Attacker story | Part of system affected | Impact type (S/P/A) |
+|----------|-----------|----------------|------------------------|--------------------|
+| S-01 | | *As a ..., I want to ... via ..., so that ...* | | |
+| S-02 | | | | |
+| S-03 | | | | |
+| S-04 | | | | |
+| S-05 | | | | |
+| S-06 | | | | |
+| S-07 | | | | |
+| S-08 | | | | |
 
 *(add rows as needed — aim for at least 8)*
+
+**Impact type:** **S** = patient safety (physical harm) · **P** = privacy / PHI (confidentiality) · **A** = availability (loss of scanning / care disruption). Tag the *dominant* type — it tells you which harm to score in Q2.2. A threat can carry more than one.
 
 ---
 
@@ -127,10 +129,14 @@ Write each threat as an attacker story:
 Score each story. Use your judgement as a group — you don't need to be precise.
 
 **Exploitability:** 1 = Low (needs rare access or high skill — physical access, privileged insider, zero-day) · 2 = Moderate (remotely exploitable with moderate skill or a known weakness) · 3 = High (trivial — default/no credentials, public exploit, reachable from the network)  
-**Severity of patient harm:** 1 = Minor (no patient harm, quickly fixed) · 2 = Significant (care delayed/degraded, or a data breach) · 3 = Serious (direct patient harm plausible — misdiagnosis acted on, device unavailable in an emergency)  
+**Severity of harm** (patient safety first — also privacy and availability): 1 = Minor (no patient harm; negligible privacy/operational impact; quickly fixed) · 2 = Significant (care delayed or degraded, a privacy/PHI breach, or meaningful downtime) · 3 = Serious (direct patient harm plausible, a large-scale PHI breach, or extended loss of scanning)  
 **Risk = Exploitability × Severity** → 1–2: Low · 3–4: Medium · 6–9: High
 
 > **Why exploitability, not likelihood?** Security risk can't be estimated as a probability the way ISO 14971 safety risk is. The FDA expects security risk to be judged on *exploitability* — how feasible the attack is. Exploitability × severity is also the FDA's controlled/uncontrolled risk matrix.
+
+> **Severity covers more than physical harm.** Patient safety is the dominant lens, but score each threat on its *worst* harm — a confidentiality-only threat (PHI breach) is scored on the severity of that privacy harm, not marked "no harm." Use the Q2.1 impact type (S/P/A) to decide which harm you're scoring.
+
+> **In a real engagement:** this simple 3×3 is a teaching scale. Production threat models usually layer **STRIDE** (systematic threat enumeration per component/data flow) and **CVSS** (standardized exploitability scoring) on top — noting that base CVSS doesn't capture patient-safety severity, so it's adapted (e.g. a medical-device rubric) rather than used raw.
 
 > **Patient safety rule:** If a story could directly harm a patient (wrong diagnosis acted on, device unavailable in emergency), mark it **High** regardless of the score and add a note.
 

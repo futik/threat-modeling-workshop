@@ -113,10 +113,13 @@ Write the format on the board or project it.
 
 > *"We don't score how* likely *an attack is — you can't put odds on an adversary, and the FDA explicitly rejects probabilistic scoring for security risk. We score* exploitability*: how feasible is the attack — skill, access, is there a public exploit, is it reachable remotely?"*
 
-- The two axes — exploitability × severity of patient harm — are the FDA's 2016 **controlled / uncontrolled** risk matrix.
+- The two axes — exploitability × severity of harm — are the FDA's 2016 **controlled / uncontrolled** risk matrix.
+- **Severity ≠ only physical injury.** Patient safety is the dominant lens, but a confidentiality-only threat (PHI breach) is scored on the severity of its *privacy* harm — not marked "no harm." The Q2.1 impact-type tag (S = safety, P = privacy, A = availability) tells the group which harm to score.
 - The *"could this directly harm a patient? → mark High"* rule is the **severity axis** doing its job.
 - Cybersecurity risk scales *independently* of software/safety risk — don't inherit safety scores.
 > *Reviewer red flag:* probabilistic language ("1-in-X chance", frequencies) — the classic security-risk deficiency.
+
+**If a group asks "is this how it's really done?":** this 3×3 is a teaching scale. Real engagements layer **STRIDE** (systematic threat enumeration per component/data flow — already used in the reference model) and **CVSS** (standardized exploitability scoring, adapted for patient-safety severity rather than used raw). Point them to the "In a real engagement" note in `workshop/q2-what-can-go-wrong.md`.
 
 ---
 

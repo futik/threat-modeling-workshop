@@ -43,7 +43,7 @@ Write each story as:
 **Another example:**
 > As a rogue vendor technician, I want to modify the AI diagnostic model via the remote support channel, so that the system returns false negatives and patients are misdiagnosed.
 
-Aim for at least **8 stories** across different parts of the system. Fill them into the template.
+Aim for at least **8 stories** across different parts of the system. Fill them into the template — and for each, tag its **impact type**: **S** = patient safety, **P** = privacy/PHI, **A** = availability. That tag tells you which harm to score in Part B.
 
 ---
 
@@ -61,13 +61,15 @@ Once you have your stories, score each one. You don't need to be precise — use
 | 2 — Moderate | Remotely exploitable with moderate skill, or a known/published weakness |
 | 3 — High | Trivial: default or no credentials, a public exploit, reachable from the network |
 
-### Severity of patient harm
+### Severity of harm — patient safety first, but also privacy and availability
 
 | Score | Meaning |
 |-------|---------|
-| 1 — Minor | No patient harm; minor inconvenience; quickly fixed |
-| 2 — Significant | Care delayed or degraded, or a data breach |
-| 3 — Serious | Direct patient harm plausible; serious breach; device down for hours or days |
+| 1 — Minor | No patient harm; negligible privacy/operational impact; quickly fixed |
+| 2 — Significant | Care delayed or degraded, a privacy/PHI breach, or meaningful downtime |
+| 3 — Serious | Direct patient harm plausible, a large-scale PHI breach, or extended loss of scanning |
+
+> **Score the worst harm — not only physical injury.** A confidentiality-only threat (e.g. a PHI leak) is scored on the severity of that *privacy* harm; don't mark it "no harm". Your Q2.1 impact-type tag (S/P/A) tells you which harm to score.
 
 ### Risk score = Exploitability × Severity
 
@@ -80,6 +82,15 @@ Once you have your stories, score each one. You don't need to be precise — use
 ### Patient safety rule
 
 After scoring, ask: *"Could this threat directly harm a patient?"* — wrong diagnosis acted on, scan unavailable during an emergency, incorrect therapy delivered. If yes, **mark it High priority regardless of the score** and note your reasoning.
+
+---
+
+## In a real engagement
+
+This simple 3×3 is a teaching scale designed to move fast. A production medical-device threat model usually layers on two industry techniques — worth knowing they exist:
+
+- **STRIDE** — a structured way to enumerate threats by type (Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege) against each component and data flow, so coverage is systematic rather than brainstormed.
+- **CVSS** — a standardized way to score exploitability. Note that base CVSS was built for enterprise IT and does **not** capture patient-safety severity, so medical-device teams adapt it (e.g. a rubric that maps to patient harm) rather than using the raw score.
 
 ---
 

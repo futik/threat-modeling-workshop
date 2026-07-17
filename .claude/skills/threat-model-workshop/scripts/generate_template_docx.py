@@ -158,12 +158,15 @@ def main():
                   "support role via the shared remote support credential, so that I can exfiltrate "
                   "patient data or plant a backdoor. Aim for ≥8 stories across different parts of the system.")
     add_table(doc,
-              ["Story ID", "Bad actor", "Attacker story", "Part of system affected"],
+              ["Story ID", "Bad actor", "Attacker story", "Part of system affected", "Impact type (S/P/A)"],
               n_blank_rows=8,
               example_row=["S-01", "Ransomware group",
                            "As a ransomware group, I want to encrypt the acquisition workstation via a "
                            "phishing email, so that the hospital cannot perform scans and must pay a ransom.",
-                           "Acquisition workstation"])
+                           "Acquisition workstation", "A"])
+    add_hint(doc, "Impact type: S = patient safety (physical harm) · P = privacy / PHI "
+                  "(confidentiality) · A = availability (loss of scanning / care disruption). "
+                  "Tag the dominant type — it tells you which harm to score in 2.2. A threat can carry more than one.")
 
     doc.add_heading("2.2 Risk assessment", level=3)
     p = doc.add_paragraph()
@@ -171,13 +174,16 @@ def main():
     p.add_run("1 = Low (rare access / high skill) · 2 = Moderate (remote, known weakness) · "
               "3 = High (trivial, public exploit)")
     p1b = doc.add_paragraph()
-    p1b.add_run("Severity of patient harm: ").bold = True
-    p1b.add_run("1 = Minor · 2 = Significant · 3 = Serious")
+    p1b.add_run("Severity of harm (patient safety first — also privacy & availability): ").bold = True
+    p1b.add_run("1 = Minor (no patient harm; negligible privacy/operational impact) · "
+                "2 = Significant (care delayed/degraded, a privacy/PHI breach, or meaningful downtime) · "
+                "3 = Serious (direct patient harm, a large-scale PHI breach, or extended loss of scanning)")
     p2 = doc.add_paragraph()
     p2.add_run("Risk = Exploitability × Severity  →  1–2: Low · 3–4: Medium · 6–9: High").bold = True
     note = doc.add_paragraph()
     nr = note.add_run("Patient safety rule: if a story could directly harm a patient, mark it High "
-                      "regardless of score and add a note.")
+                      "regardless of score and add a note. Score a confidentiality-only threat on the "
+                      "severity of its privacy harm — not \"no harm\".")
     nr.bold = True
     fda = doc.add_paragraph()
     fr = fda.add_run("FDA note: security risk is scored on exploitability (how feasible the attack "
@@ -186,6 +192,14 @@ def main():
     fr.italic = True
     fr.font.color.rgb = NOTE
     fr.font.size = Pt(10)
+    eng = doc.add_paragraph()
+    er = eng.add_run("In a real engagement: this 3×3 is a teaching scale. Production threat models "
+                     "usually layer STRIDE (systematic enumeration per component/data flow) and CVSS "
+                     "(standardized exploitability scoring) on top — noting base CVSS doesn't capture "
+                     "patient-safety severity, so it's adapted with a medical-device rubric, not used raw.")
+    er.italic = True
+    er.font.color.rgb = NOTE
+    er.font.size = Pt(10)
     add_table(doc,
               ["Story ID", "Exploitability (1–3)", "Rationale", "Severity (1–3)", "Rationale",
                "Risk score", "Patient safety?", "Priority"],
