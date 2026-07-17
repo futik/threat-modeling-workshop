@@ -1,19 +1,5 @@
 # Q2 — What can go wrong?
 
-## Facilitator intro (5 min)
-
-> Read or paraphrase the following to the group before they start working.
-
-"Now that we know what we're working on, we need to think like attackers. We're going to use a technique called **Attacker Stories** — it's like user stories in agile, but written from the perspective of someone who wants to cause harm.
-
-The format is simple:
-
-> *As a [bad actor], I want to [do something bad] via [method or entry point], so that [I can achieve my goal].*
-
-You don't need to know the technical details perfectly. Think about what a bad actor would *want* — and then work backwards to how they might get it. Once you have your stories, you'll quickly score each one by likelihood and impact."
-
----
-
 ## Part A: Attacker Stories
 
 ### Who are your bad actors?

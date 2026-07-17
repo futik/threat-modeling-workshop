@@ -63,7 +63,9 @@ Give groups **5 minutes** to read the scenario silently before you move on.
 
 ## Block 2 — Q1: What are we working on? (20 min)
 
-**3 min:** Read the facilitator intro from `workshop/q1-what-are-we-working-on.md`  
+**3 min — say to the group:**
+> *"Before we can find threats, we need to agree on what we're actually protecting. This first question is about building a shared map of the system — the components, the data, where it flows, and who's involved. Without this, different people in your group will be thinking about different things. We're going to identify: what are the valuable assets, where are the doors in and out, and who might want to cause harm. Don't worry about being perfect — you can always refine as you go."*
+
 **17 min:** Groups work on Q1 of the template
 
 **Facilitation tips:**
@@ -83,7 +85,9 @@ Give groups **5 minutes** to read the scenario silently before you move on.
 
 ## Block 3 — Q2: What can go wrong? (35 min)
 
-**5 min:** Read the facilitator intro from `workshop/q2-what-can-go-wrong.md`, explain Attacker Stories  
+**5 min — say to the group:**
+> *"Now that we know what we're working on, we need to think like attackers. We're going to use a technique called Attacker Stories — like agile user stories, but written from the perspective of someone who wants to cause harm. The format is: 'As a [bad actor], I want to [do something bad] via [method or entry point], so that [I can achieve my goal].' You don't need the technical details perfectly — think about what a bad actor would want, then work backwards to how they'd get it. Once you have your stories, you'll quickly score each one."*
+
 **20 min:** Groups write attacker stories (Q2.1)  
 **10 min:** Groups score risk (Q2.2)
 
@@ -118,7 +122,9 @@ Write the format on the board or project it.
 
 ## Block 4 — Q3: What are we going to do about it? (20 min)
 
-**3 min:** Read the facilitator intro from `workshop/q3-what-are-we-going-to-do-about-it.md`  
+**3 min — say to the group:**
+> *"Now that we know what can go wrong, we decide what to do about it. Not everything needs fixing — sometimes the risk is low enough to accept, or there's no feasible fix. What matters is that you make a conscious decision and document it. For each high-priority threat, define at least one concrete mitigation. Be specific — 'add encryption' is not a mitigation; 'enable TLS on the DICOM connection between the workstation and the local server' is. And remember this is a medical device: some mitigations may require a new regulatory submission, or create new risks for clinicians in an emergency. Those trade-offs are worth discussing."*
+
 **17 min:** Groups work on Q3 of the template
 
 **Tips:**
@@ -136,7 +142,11 @@ Write the format on the board or project it.
 
 ## Block 5 — Q4: Did we do a good job? + Presentations (20 min)
 
-**3 min:** Groups review their template against the checklist (Q4)  
+**3 min — say to the group:**
+> *"The last question is about stepping back and reviewing your own work. A threat model is only useful if it's honest — it shouldn't just list the obvious threats and call it done. Use the checklist in your template to make sure nothing is missing. Then each group presents its top findings — not to compete, but to find gaps. The best outcome is that another group spots something you missed."*
+
+Then groups review their template against the checklist (Q4).
+
 **~5 min per group:** Each group presents:
 1. Their **top 3 threats** and why they ranked them highest
 2. Their **most surprising** story
