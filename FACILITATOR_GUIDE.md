@@ -76,6 +76,11 @@ Give groups **5 minutes** to read the scenario silently before you move on.
 
 **Checkpoint:** before moving on, each group should have at least 5 assets and 3–4 entry points listed.
 
+**Seed examples — offer only if a group is stuck (from the reference model):**
+- *Assets:* A-01 patient DICOM images (PHI) — Confidentiality + Integrity · A-04 imaging-unit firmware — Integrity · A-07 scan availability — Availability
+- *Entry points:* remote support (VPN + SSH, **shared** credential) — untrusted, high risk · local admin console :8443 (username/password, **no MFA**)
+- *Actors:* rogue MediScanTech engineer with privileged cloud + update-delivery access · external cybercriminal via phishing
+
 **FDA lens — scope & traceability foundation.** The FDA wants the model scoped at the **medical device system** level — the device *plus* its connected/cloud/interoperable parts (Interoperability §V.A.3; Third-Party Software §V.A.4), not just the box. Two things to nudge groups on:
 - **Capture third-party components now** — they become the **SBOM** required by §524B(b)(3).
 - **Assets/entry points get stable IDs** — the FDA requires "traceability between the threat model, cybersecurity risk assessment, SBOM, and testing documentation," and that's impossible without IDs set here.
@@ -109,6 +114,12 @@ Write the format on the board or project it.
 - Common mistake: scoring everything 3×3 because "it's a medical device" — push for differentiation
 - If no patient safety flags: *"Which of your stories, if it happened, could mean a patient got the wrong diagnosis and was treated for the wrong condition?"*
 
+**Seed examples — offer only if a group is stuck:**
+- *Story (safety):* "As a rogue vendor technician, I want to modify the AI model via the remote support channel, so that the system returns false negatives and patients are misdiagnosed."
+- *Story (safety):* "As an attacker on the hospital LAN, I want to intercept unencrypted DICOM traffic, so that I can alter the images the radiologist diagnoses from."
+- *Story (privacy):* "As a MediScanTech insider, I want to re-identify anonymised images in cloud storage, so that I can breach patient privacy."
+- *Scored example:* admin-console brute force (no MFA, reachable LAN-wide) → Exploitability 3 × Severity 3 = **9, High**.
+
 **FDA lens — exploitability, not probability (say this out loud).** This is the most FDA-sensitive step, and the template scores it the FDA way: **Exploitability × Severity of patient harm**, not Likelihood × Impact. Make the reason explicit:
 
 > *"We don't score how* likely *an attack is — you can't put odds on an adversary, and the FDA explicitly rejects probabilistic scoring for security risk. We score* exploitability*: how feasible is the attack — skill, access, is there a public exploit, is it reachable remotely?"*
@@ -136,6 +147,12 @@ Write the format on the board or project it.
 - Common mistake: generic mitigations — redirect to the template example
 - For groups that finish fast: ask them to note residual risk for each mitigation, and whether the hospital or the manufacturer is responsible for implementing it
 
+**Seed examples — offer only if a group is stuck:**
+- *M-01 (Preventive):* MFA on the admin console + replace the shared support credential with per-engineer PKI certs; rate-limit logins. *Residual:* theft still possible if the device is already compromised. *Reg:* software-only, likely no new clearance.
+- *M-02 (Preventive):* enable DICOM TLS and restrict connections to an allowlisted workstation IP.
+- *M-03 (Detective + Preventive):* cryptographically sign AI inference results; the workstation verifies the signature before displaying them.
+- *M-06 (Corrective):* graceful-degradation mode if the cloud AI is unavailable — warn the radiologist and allow manual-only review.
+
 **FDA lens — the risk assessment consumes the model.** The cybersecurity risk assessment (§V.A.2) evaluates controls against the threats, computes **pre- and post-mitigation (residual) risk**, and records **acceptability decisions** against defined criteria. The FDA wants the *method* documented, not just the numbers.
 - Insist on a **residual risk** statement for every mitigation.
 - Name the **safety ↔ security interface**: a security control "must not inadvertently introduce new risks in the other" assessment. The MFA-locks-out-the-engineer and secure-boot-needs-a-new-submission trade-offs *are* this interface.
@@ -158,6 +175,12 @@ Then groups review their template against the checklist (Q4).
 Other groups: ask one question — *"Did you consider X?"*
 
 **Facilitator role:** note themes across groups; call out threats that only one group found; highlight where groups disagreed on risk scores.
+
+**Seed example — what a strong review looks like (reveal after groups present):**
+- *Top 3:* T-04 no-MFA admin console · T-07 shared remote-support credential · T-03 unencrypted DICOM on the LAN
+- *Most surprising:* T-09 — a rogue insider silently altering the cloud AI model, biasing results across thousands of patients
+- *Hardest trade-off:* T-01 firmware integrity — a proper fix (secure boot) needs a hardware revision and a new 510(k), so the interim is signed update packages + integrity checks
+- *Open question logged:* what is the SLA to rotate the shared remote-support credential?
 
 **FDA lens — a living document across the TPLC.** Threat modeling and risk assessment must be **maintained throughout the Total Product Life Cycle** — not a one-time premarket artifact (§V.A.6, §VII.C.1). The statutory hook is the word **"maintain"** in §524B(b)(2).
 - Point to concrete **re-trigger criteria**: new feature, new interface, new deployment environment, a disclosed vulnerability, or an incident.
