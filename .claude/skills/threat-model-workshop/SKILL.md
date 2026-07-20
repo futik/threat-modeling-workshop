@@ -84,6 +84,21 @@ embedded images for diagrams.
 - One `.docx` per team (rename `threat-model-[team-name].docx`), OR
 - One shared Google Drive folder where each team copies the uploaded doc.
 
+### Filled reference example (.docx)
+
+To hand out the completed worked example in the same format teams use:
+
+```
+python scripts/generate_example_docx.py [optional_output_path]
+```
+
+This renders `templates/example-filled-template.md` (the "Facilitators — Reference
+Example" threat model, which uses attacker stories) to
+`templates/example-filled-template.docx`, reusing the same fonts, heading styles,
+and shaded tables as the blank worksheet. The markdown is the source of truth —
+edit it and re-run rather than editing the `.docx`. Only `python-docx` is needed
+(no matplotlib; the example has no rendered diagram).
+
 ---
 
 ## Mode B — Batch-evaluate submissions and compare teams
@@ -200,6 +215,9 @@ and is git-ignored by default.
 - `scripts/generate_template_docx.py` — builds the combined `.docx` (Product &
   Architecture + fillable worksheet) as page-break sections, with the architecture
   diagram rendered as an embedded PNG.
+- `scripts/generate_example_docx.py` — renders the filled reference example
+  (`templates/example-filled-template.md`) to
+  `templates/example-filled-template.docx`.
 - `scripts/extract_submission.py` — converts a filled `.docx` back to markdown
   (headings + tables) for evaluation.
 - `scripts/generate_sample_submissions.py` — writes sample filled worksheets for
