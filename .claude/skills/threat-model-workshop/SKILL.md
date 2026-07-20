@@ -23,33 +23,40 @@ Two modes. Pick based on what the user asks for.
 ## Mode A — Generate the participant document (.docx)
 
 **Goal:** produce `templates/threat-model-template.docx`, a single
-Google-Docs-friendly document that contains everything a team needs in one file,
-as three page-break-separated sections that read like tabs:
+Google-Docs-friendly document that contains what a team needs during the
+exercise, as two page-break-separated sections that read like tabs:
 
-1. **Introduction** — why threat model medical devices (mirrors
-   `workshop/00-introduction.md`).
-2. **Product & Architecture** — the NeuroScan 3000 scenario (mirrors
+1. **Product & Architecture** — the NeuroScan 3000 scenario (mirrors
    `scenario/device-overview.md` and `scenario/system-architecture.md`, including
-   the ASCII architecture diagram, trust boundaries, data flows, and interfaces).
-3. **Threat Model Worksheet** — the fillable Q1–Q4 worksheet (mirrors
+   the architecture diagram, trust boundaries, data flows, and interfaces).
+2. **Threat Model Worksheet** — the fillable Q1–Q4 worksheet (mirrors
    `templates/threat-model-template.md`).
+
+The workshop **introduction** (`workshop/00-introduction.md`) is intentionally
+NOT in the generated `.docx`. It stays in the repo and the facilitator shares it
+separately, so the participant document stays focused on the product and the
+worksheet they fill in.
 
 Steps:
 
-1. Ensure `python-docx` is available:
-   `pip install --break-system-packages python-docx` (or `pip install python-docx`).
+1. Ensure dependencies are available:
+   `pip install --break-system-packages python-docx matplotlib`
+   (matplotlib is used to render the architecture diagram image).
 2. Run the generator:
    `python scripts/generate_template_docx.py [optional_output_path]`
    Default output is `templates/threat-model-template.docx` in the repo.
 3. Confirm the file opens and share it with the user.
 
-**Why one combined document:** teams get context (why it matters), the product
-they're analyzing, and the worksheet to fill in — all in one file, so there's
-nothing to cross-reference during the exercise.
+**Architecture diagram:** the diagram is rendered as a **PNG image** (via
+matplotlib, `render_architecture_png`) and embedded with `doc.add_picture`. It is
+NOT drawn with ASCII box characters — ASCII art depends on a monospaced font and
+exact column alignment, which breaks when Google Docs reflows the text on import.
+An embedded image renders identically in Word and Google Docs. To change the
+diagram, edit `render_architecture_png` (boxes, arrows, zones) and re-run.
 
 **About "tabs":** a `.docx` cannot carry real Google Docs *document tabs* — that
 feature is Google-Docs-native and is not created on `.docx` import. The portable
-equivalent used here is three **Heading 1 sections separated by page breaks**, so
+equivalent used here is two **Heading 1 sections separated by a page break**, so
 the document has a clean outline (View → Show outline in Google Docs) and each
 section starts on its own page. If a facilitator wants literal Google Docs tabs,
 after uploading they can, in Google Docs: open the tabs/outline panel, add a tab
@@ -64,11 +71,12 @@ tables survive the import/export both ways.
 
 **If the user wants the document changed** (add a column, change scoring labels,
 add a section, update the scenario): edit `scripts/generate_template_docx.py` and
-re-run. The three sections are built by `add_intro_section`, `add_product_section`,
-and the worksheet code in `main`. If the source markdown in `workshop/` or
-`scenario/` changes, update the corresponding builder so the document stays in
-sync. Keep it Google-Docs-safe — no content controls, form fields, text boxes, or
-macros; only Heading 1/2/3 styles, Normal text, and `Table Grid` tables.
+re-run. The two sections are built by `add_product_section` (with the diagram from
+`render_architecture_png`) and the worksheet code in `main`. If the source
+markdown in `scenario/` changes, update `add_product_section` so the document
+stays in sync. Keep it Google-Docs-safe — no content controls, form fields, text
+boxes, or macros; only Heading 1/2/3 styles, Normal text, `Table Grid` tables, and
+embedded images for diagrams.
 
 **Facilitator distribution options:**
 - One `.docx` per team (rename `threat-model-[team-name].docx`), OR
@@ -125,18 +133,20 @@ After evaluating all teams, produce a comparison:
 
 ## Files in this skill
 
-- `scripts/generate_template_docx.py` — builds the combined `.docx` (Introduction
-  + Product & Architecture + fillable worksheet) as page-break sections.
+- `scripts/generate_template_docx.py` — builds the combined `.docx` (Product &
+  Architecture + fillable worksheet) as page-break sections, with the architecture
+  diagram rendered as an embedded PNG.
 - `scripts/extract_submission.py` — converts a filled `.docx` back to markdown
   (headings + tables) for evaluation.
 
 ## Related repo files (not part of this skill, but used by it)
 
 - `templates/threat-model-template.md` — the canonical worksheet content (mirrored
-  into section 3 of the generated `.docx`).
-- `workshop/00-introduction.md` — source for section 1 (Introduction).
+  into the worksheet section of the generated `.docx`).
+- `workshop/00-introduction.md` — the workshop introduction. Shared from the repo
+  by the facilitator; intentionally NOT embedded in the generated `.docx`.
 - `scenario/device-overview.md`, `scenario/system-architecture.md` — source for
-  section 2 (Product & Architecture).
+  the Product & Architecture section.
 - `prompts/evaluation-system-prompt.md` — the evaluation rubric and output format.
 - `prompts/threat-model-system-prompt.md` — for generating a reference model.
 - `submissions/` — where filled worksheets and generated feedback live.

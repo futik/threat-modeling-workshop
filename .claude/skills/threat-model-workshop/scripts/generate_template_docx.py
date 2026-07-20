@@ -2,21 +2,31 @@
 """
 Generate the participant workshop document as a single Google-Docs-friendly .docx.
 
-The document combines everything a team needs in one file, as three sections
-separated by page breaks so they read like tabs:
-  1. Introduction — why threat model medical devices (from workshop/00-introduction.md)
-  2. Product & architecture — the NeuroScan 3000 scenario (from scenario/*.md)
-  3. Threat model worksheet — the fillable Q1–Q4 worksheet
+The document combines what a team needs during the exercise in one file, as two
+sections separated by a page break so they read like tabs:
+  1. Product & architecture — the NeuroScan 3000 scenario (from scenario/*.md)
+  2. Threat model worksheet — the fillable Q1–Q4 worksheet
+
+The workshop *introduction* is intentionally NOT included here — it lives in
+workshop/00-introduction.md and is shared from the repo by the facilitator.
+
+The architecture diagram is rendered as a PNG image (via matplotlib) and embedded,
+rather than drawn with ASCII box characters. ASCII art relies on a monospaced
+font and exact column alignment, which breaks on Google Docs import; an embedded
+image renders identically in Word and Google Docs.
 
 Design constraints for clean Google Docs import:
 - Built-in heading styles only (Heading 1/2/3) so Google Docs keeps the outline.
 - Standard font (Calibri) and simple tables with a bold header row.
 - No content controls, form fields, macros, or text boxes (Google Docs strips them).
 - Blank table cells / underscore lines act as fill-in areas.
-- Page breaks between the three sections. Google Docs has no way to embed real
+- Diagrams are embedded images (survive import intact).
+- Page break between the two sections. Google Docs has no way to embed real
   document "tabs" via .docx import; the page-break sections plus the Heading 1
   outline are the portable equivalent. Teams who want literal Google Docs tabs
-  can split the three Heading 1 sections into tabs after uploading (see SKILL.md).
+  can split the two Heading 1 sections into tabs after uploading (see SKILL.md).
+
+Requirements: python-docx and matplotlib.
 
 Usage:
     python generate_template_docx.py [output_path]
@@ -24,11 +34,12 @@ Default output: ../../../templates/threat-model-template.docx (relative to this 
 """
 
 import sys
+import tempfile
 from pathlib import Path
 
 from docx import Document
-from docx.enum.text import WD_BREAK
-from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
+from docx.shared import Inches, Pt, RGBColor
 
 ACCENT = RGBColor(0x1F, 0x49, 0x7D)      # dark blue for headings
 HEADER_FILL = "1F497D"                     # table header shading
@@ -133,82 +144,78 @@ def add_info_table(doc, headers, rows):
     return table
 
 
-def add_intro_section(doc):
-    """Section 1: why threat model medical devices (from workshop/00-introduction.md)."""
-    doc.add_heading("Introduction — Why Threat Model Medical Devices?", level=1)
+def render_architecture_png():
+    """Render the NeuroScan 3000 architecture as a PNG and return its path.
 
-    doc.add_heading("What is threat modeling?", level=2)
-    doc.add_paragraph(
-        "Threat modeling is a structured process for identifying security and safety "
-        "threats to a system, assessing their risk, and designing countermeasures — "
-        "before an attacker does it for you.")
-    doc.add_paragraph("At its core it answers four questions:")
-    add_numbered(doc, [
-        "What are we working on? — system decomposition and scoping",
-        "What can go wrong? — threat identification and risk assessment",
-        "What are we going to do about it? — mitigations and controls",
-        "Did we do a good job? — validation and review",
-    ])
+    Uses matplotlib so there is no system-level graphviz dependency. Returns a
+    path in a temp dir; the caller embeds it into the .docx (python-docx copies
+    the bytes into the package, so the temp file can be discarded afterwards).
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import FancyArrow, FancyBboxPatch
 
-    doc.add_heading("Why does it matter for medical devices?", level=2)
-    doc.add_paragraph(
-        "Medical devices are increasingly software-defined and network-connected. "
-        "This creates new attack surfaces that didn't exist a decade ago.")
-    p = doc.add_paragraph()
-    p.add_run("The stakes are uniquely high:").bold = True
-    add_bullets(doc, [
-        "A compromised device can directly harm patients (wrong diagnosis, wrong therapy)",
-        "Medical records are among the most valuable data on the black market",
-        "Ransomware attacks on hospitals have demonstrably delayed care and caused patient harm",
-        "Regulatory bodies (FDA, EU MDR) now require cybersecurity documentation as part of "
-        "premarket submissions",
-    ])
-    p = doc.add_paragraph()
-    p.add_run("Real-world context:").bold = True
-    add_bullets(doc, [
-        "The FDA's 2023 guidance on cybersecurity in medical devices requires manufacturers to "
-        "submit a threat model as part of the 510(k) / PMA process",
-        "MITRE's Playbook (2021) provides a structured framework specifically for medical devices",
-        "ICS-CERT and CISA regularly publish advisories on vulnerabilities in medical device software",
-    ])
+    accent = "#1F497D"
+    box_fill = "#EAF0F7"
+    zone_edge = "#1F497D"
 
-    doc.add_heading("The MITRE Medical Device Threat Modeling Playbook", level=2)
-    doc.add_paragraph(
-        "This workshop is based on the MITRE Playbook for Threat Modeling Medical Devices. "
-        "The playbook is structured around four questions:")
-    add_info_table(doc,
-                   ["Question", "Activity"],
-                   [
-                       ["Q1", "What are we working on? — scope the system, identify assets, "
-                              "entry points, and actors"],
-                       ["Q2", "What can go wrong? — identify threats (STRIDE, ATT&CK) and "
-                              "assess their risk"],
-                       ["Q3", "What are we going to do about it? — define mitigations and controls"],
-                       ["Q4", "Did we do a good job? — validate completeness, document, and review"],
-                   ])
+    fig, ax = plt.subplots(figsize=(9, 7))
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 100)
+    ax.axis("off")
 
-    doc.add_heading("What makes medical device threat modeling different?", level=2)
-    add_info_table(doc,
-                   ["Aspect", "General IT", "Medical Devices"],
-                   [
-                       ["Primary risk", "Data breach, service disruption",
-                        "Patient harm, misdiagnosis"],
-                       ["Availability", "Important", "Often life-critical"],
-                       ["Patching cadence", "Weekly/monthly", "12–18 months (FDA clearance required)"],
-                       ["Regulatory context", "GDPR, CCPA",
-                        "FDA, EU MDR, IEC 62443, IEC 81001-5-1"],
-                       ["Threat actors", "Opportunistic attackers",
-                        "Includes nation-states targeting healthcare"],
-                       ["Supply chain", "Standard IT",
-                        "Proprietary protocols, COTS components in regulated systems"],
-                   ])
+    def zone(x, y, w, h, label):
+        ax.add_patch(FancyBboxPatch(
+            (x, y), w, h, boxstyle="round,pad=0.4,rounding_size=1.5",
+            linewidth=1.5, edgecolor=zone_edge, facecolor="none", linestyle="--"))
+        ax.text(x + 1.5, y + h - 2.5, label, fontsize=10, fontweight="bold",
+                color=accent, va="top")
 
-    doc.add_heading("Today's scenario", level=2)
-    doc.add_paragraph(
-        "You will threat model the NeuroScan 3000 — a hybrid MRI-based neurological imaging "
-        "system. The next section (Product & Architecture) describes it. Read it before you "
-        "start Q1, then fill in the Threat Model Worksheet section by section as you work "
-        "through Q1–Q4.")
+    def box(cx, cy, w, h, lines):
+        ax.add_patch(FancyBboxPatch(
+            (cx - w / 2, cy - h / 2), w, h,
+            boxstyle="round,pad=0.2,rounding_size=1.0",
+            linewidth=1.2, edgecolor=accent, facecolor=box_fill))
+        ax.text(cx, cy, "\n".join(lines), fontsize=8, ha="center", va="center",
+                color="#111111")
+
+    def arrow(x1, y1, x2, y2, label=None, two_way=False, ls="-"):
+        ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
+                    arrowprops=dict(arrowstyle="<->" if two_way else "->",
+                                    color="#333333", lw=1.3, linestyle=ls))
+        if label:
+            ax.text((x1 + x2) / 2, (y1 + y2) / 2, label, fontsize=7,
+                    color="#555555", ha="center", va="center",
+                    bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none"))
+
+    # Hospital zone (top)
+    zone(4, 55, 92, 42, "HOSPITAL NETWORK")
+    box(22, 78, 26, 14, ["Imaging Unit", "(RTOS firmware)"])
+    box(68, 78, 34, 14, ["Acquisition Workstation", "(Windows 10)",
+                         "Scanning SW · Admin console :8443"])
+    box(68, 61, 30, 9, ["Local DICOM Server", "(stores scan images)"])
+    arrow(35, 78, 51, 78, "USB / proprietary", two_way=True)
+    arrow(68, 71, 68, 65.5, "Hospital LAN")
+
+    # Cloud zone (bottom)
+    zone(4, 6, 92, 40, "MEDISCANTECH CLOUD")
+    box(24, 34, 30, 10, ["AI Inference Service", "(REST API)"])
+    box(66, 34, 28, 10, ["Cloud Storage", "(anon. images)"])
+    box(50, 20, 66, 8, ["Manufacturer Backend (training, monitoring, support)"])
+    box(50, 10, 66, 7, ["Update Delivery Service"])
+    arrow(51, 34, 39, 34, two_way=True)
+
+    # Cross-boundary flows (kept in the gap between the two zones to avoid
+    # crossing any component boxes)
+    arrow(34, 55, 30, 39.5, "Internet\n(TLS 1.3, mutual TLS)")
+    arrow(84, 16, 84, 54.5, "Updates\n(signed pkgs)", ls="--")
+
+    fig.tight_layout(pad=0.5)
+    out = Path(tempfile.gettempdir()) / "neuroscan_architecture.png"
+    fig.savefig(out, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    return out
 
 
 def add_product_section(doc):
@@ -308,45 +315,11 @@ def add_product_section(doc):
 
     # --- Architecture diagram ---
     doc.add_heading("Architecture diagram", level=2)
-    add_hint(doc, "Monospaced ASCII diagram — best viewed in a fixed-width font.")
-    diagram = (
-        "┌──────────────────────────────────────────────────────────────────┐\n"
-        "│  HOSPITAL NETWORK                                                  │\n"
-        "│                                                                    │\n"
-        "│  ┌──────────────┐    USB /      ┌────────────────────────────┐     │\n"
-        "│  │  Imaging     │  Proprietary  │  Acquisition Workstation    │     │\n"
-        "│  │  Unit        │◄─────────────►│  (Windows 10)               │     │\n"
-        "│  │  (RTOS)      │   Protocol    │  Scanning software          │     │\n"
-        "│  │              │               │  Admin console (:8443)      │     │\n"
-        "│  └──────────────┘               └──────────┬─────────────────┘     │\n"
-        "│                                        Hospital LAN                 │\n"
-        "│                               ┌────────────▼───────────┐           │\n"
-        "│                               │  Local DICOM Server     │           │\n"
-        "│                               │  (stores scan images)   │           │\n"
-        "│                               └────────────────────────┘           │\n"
-        "└──────────────────────────┬────────────────────────────────────────┘\n"
-        "                           │ Internet (TLS 1.3, mutual TLS)\n"
-        "┌──────────────────────────▼────────────────────────────────────────┐\n"
-        "│  MEDISCANTECH CLOUD                                                 │\n"
-        "│  ┌──────────────────┐   ┌──────────────────┐                       │\n"
-        "│  │  AI Inference    │◄──│  Cloud Storage   │                       │\n"
-        "│  │  Service (REST)  │   │  (anon. images)  │                       │\n"
-        "│  └──────────────────┘   └──────────────────┘                       │\n"
-        "│  ┌──────────────────────────────────────────────────────────────┐ │\n"
-        "│  │  Manufacturer Backend (training, monitoring, support)         │ │\n"
-        "│  └──────────────────────────────────────────────────────────────┘ │\n"
-        "│  ┌──────────────────────────────────────────────────────────────┐ │\n"
-        "│  │  Update Delivery Service                                      │ │\n"
-        "│  └──────────────────────────────┬───────────────────────────────┘ │\n"
-        "└─────────────────────────────────┼──────────────────────────────────┘\n"
-        "                                  │ Updates (TLS, signed packages)\n"
-        "                                  ▼\n"
-        "                     [Workstation + Imaging Unit firmware]"
-    )
-    dp = doc.add_paragraph()
-    dr = dp.add_run(diagram)
-    dr.font.name = "Consolas"
-    dr.font.size = Pt(7)
+    add_hint(doc, "Boxes = components, dashed frames = trust zones, arrows = data flows.")
+    img = render_architecture_png()
+    doc.add_picture(str(img), width=Inches(6.3))
+    # Center the image.
+    doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     # --- Trust boundaries ---
     doc.add_heading("Trust boundaries", level=2)
@@ -409,15 +382,13 @@ def main():
     doc = Document()
     style_base(doc)
 
-    # ---- Section 1: Introduction ----
-    add_intro_section(doc)
-    page_break(doc)
-
-    # ---- Section 2: Product & architecture ----
+    # ---- Section 1: Product & architecture ----
+    # (The workshop introduction lives in workshop/00-introduction.md and is not
+    #  duplicated here — the facilitator shares it from the repo.)
     add_product_section(doc)
     page_break(doc)
 
-    # ---- Section 3: Threat model worksheet ----
+    # ---- Section 2: Threat model worksheet ----
     doc.add_heading("Threat Model Worksheet — NeuroScan 3000", level=1)
     meta = doc.add_paragraph()
     meta.add_run("Team name: ").bold = True
