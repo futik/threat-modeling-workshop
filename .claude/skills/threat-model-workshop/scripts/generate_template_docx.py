@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
 """
-Generate the participant threat-model worksheet as a Google-Docs-friendly .docx.
+Generate the participant workshop document as a single Google-Docs-friendly .docx.
+
+The document combines everything a team needs in one file, as three sections
+separated by page breaks so they read like tabs:
+  1. Introduction — why threat model medical devices (from workshop/00-introduction.md)
+  2. Product & architecture — the NeuroScan 3000 scenario (from scenario/*.md)
+  3. Threat model worksheet — the fillable Q1–Q4 worksheet
 
 Design constraints for clean Google Docs import:
 - Built-in heading styles only (Heading 1/2/3) so Google Docs keeps the outline.
 - Standard font (Calibri) and simple tables with a bold header row.
 - No content controls, form fields, macros, or text boxes (Google Docs strips them).
 - Blank table cells / underscore lines act as fill-in areas.
+- Page breaks between the three sections. Google Docs has no way to embed real
+  document "tabs" via .docx import; the page-break sections plus the Heading 1
+  outline are the portable equivalent. Teams who want literal Google Docs tabs
+  can split the three Heading 1 sections into tabs after uploading (see SKILL.md).
 
 Usage:
     python generate_template_docx.py [output_path]
@@ -17,6 +27,7 @@ import sys
 from pathlib import Path
 
 from docx import Document
+from docx.enum.text import WD_BREAK
 from docx.shared import Pt, RGBColor
 
 ACCENT = RGBColor(0x1F, 0x49, 0x7D)      # dark blue for headings
@@ -86,6 +97,309 @@ def blank_lines(doc, n=3):
         doc.add_paragraph("_______________________________________________________________")
 
 
+def page_break(doc):
+    doc.add_paragraph().add_run().add_break(WD_BREAK.PAGE)
+
+
+def add_bullets(doc, items):
+    for it in items:
+        doc.add_paragraph(it, style="List Bullet")
+
+
+def add_numbered(doc, items):
+    for it in items:
+        doc.add_paragraph(it, style="List Number")
+
+
+def add_info_table(doc, headers, rows):
+    """A plain content table (not a fill-in worksheet table): header row + data rows."""
+    table = doc.add_table(rows=1 + len(rows), cols=len(headers))
+    table.style = "Table Grid"
+    for j, h in enumerate(headers):
+        cell = table.rows[0].cells[j]
+        cell.text = ""
+        run = cell.paragraphs[0].add_run(h)
+        run.bold = True
+        run.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+        run.font.size = Pt(10)
+        set_cell_background(cell, HEADER_FILL)
+    for i, row in enumerate(rows, start=1):
+        for j, val in enumerate(row):
+            cell = table.rows[i].cells[j]
+            cell.text = ""
+            run = cell.paragraphs[0].add_run(val)
+            run.font.size = Pt(10)
+    doc.add_paragraph()
+    return table
+
+
+def add_intro_section(doc):
+    """Section 1: why threat model medical devices (from workshop/00-introduction.md)."""
+    doc.add_heading("Introduction — Why Threat Model Medical Devices?", level=1)
+
+    doc.add_heading("What is threat modeling?", level=2)
+    doc.add_paragraph(
+        "Threat modeling is a structured process for identifying security and safety "
+        "threats to a system, assessing their risk, and designing countermeasures — "
+        "before an attacker does it for you.")
+    doc.add_paragraph("At its core it answers four questions:")
+    add_numbered(doc, [
+        "What are we working on? — system decomposition and scoping",
+        "What can go wrong? — threat identification and risk assessment",
+        "What are we going to do about it? — mitigations and controls",
+        "Did we do a good job? — validation and review",
+    ])
+
+    doc.add_heading("Why does it matter for medical devices?", level=2)
+    doc.add_paragraph(
+        "Medical devices are increasingly software-defined and network-connected. "
+        "This creates new attack surfaces that didn't exist a decade ago.")
+    p = doc.add_paragraph()
+    p.add_run("The stakes are uniquely high:").bold = True
+    add_bullets(doc, [
+        "A compromised device can directly harm patients (wrong diagnosis, wrong therapy)",
+        "Medical records are among the most valuable data on the black market",
+        "Ransomware attacks on hospitals have demonstrably delayed care and caused patient harm",
+        "Regulatory bodies (FDA, EU MDR) now require cybersecurity documentation as part of "
+        "premarket submissions",
+    ])
+    p = doc.add_paragraph()
+    p.add_run("Real-world context:").bold = True
+    add_bullets(doc, [
+        "The FDA's 2023 guidance on cybersecurity in medical devices requires manufacturers to "
+        "submit a threat model as part of the 510(k) / PMA process",
+        "MITRE's Playbook (2021) provides a structured framework specifically for medical devices",
+        "ICS-CERT and CISA regularly publish advisories on vulnerabilities in medical device software",
+    ])
+
+    doc.add_heading("The MITRE Medical Device Threat Modeling Playbook", level=2)
+    doc.add_paragraph(
+        "This workshop is based on the MITRE Playbook for Threat Modeling Medical Devices. "
+        "The playbook is structured around four questions:")
+    add_info_table(doc,
+                   ["Question", "Activity"],
+                   [
+                       ["Q1", "What are we working on? — scope the system, identify assets, "
+                              "entry points, and actors"],
+                       ["Q2", "What can go wrong? — identify threats (STRIDE, ATT&CK) and "
+                              "assess their risk"],
+                       ["Q3", "What are we going to do about it? — define mitigations and controls"],
+                       ["Q4", "Did we do a good job? — validate completeness, document, and review"],
+                   ])
+
+    doc.add_heading("What makes medical device threat modeling different?", level=2)
+    add_info_table(doc,
+                   ["Aspect", "General IT", "Medical Devices"],
+                   [
+                       ["Primary risk", "Data breach, service disruption",
+                        "Patient harm, misdiagnosis"],
+                       ["Availability", "Important", "Often life-critical"],
+                       ["Patching cadence", "Weekly/monthly", "12–18 months (FDA clearance required)"],
+                       ["Regulatory context", "GDPR, CCPA",
+                        "FDA, EU MDR, IEC 62443, IEC 81001-5-1"],
+                       ["Threat actors", "Opportunistic attackers",
+                        "Includes nation-states targeting healthcare"],
+                       ["Supply chain", "Standard IT",
+                        "Proprietary protocols, COTS components in regulated systems"],
+                   ])
+
+    doc.add_heading("Today's scenario", level=2)
+    doc.add_paragraph(
+        "You will threat model the NeuroScan 3000 — a hybrid MRI-based neurological imaging "
+        "system. The next section (Product & Architecture) describes it. Read it before you "
+        "start Q1, then fill in the Threat Model Worksheet section by section as you work "
+        "through Q1–Q4.")
+
+
+def add_product_section(doc):
+    """Section 2: the NeuroScan 3000 scenario (from scenario/*.md)."""
+    doc.add_heading("Product & Architecture — NeuroScan 3000", level=1)
+    add_hint(doc, "This is a fictional device created for training purposes. Any resemblance "
+                  "to real products is coincidental.")
+
+    # --- Overview ---
+    doc.add_heading("Overview", level=2)
+    doc.add_paragraph(
+        "NeuroScan 3000 is a neurological imaging system manufactured by MediScanTech Inc. "
+        "It combines MRI-guided imaging with AI-assisted diagnostics to help clinicians detect "
+        "neurological conditions such as stroke, tumours, and MS lesions.")
+    doc.add_paragraph(
+        "The system is hybrid: it has hardware on-premise in the hospital, and a cloud platform "
+        "operated by MediScanTech that provides AI analysis and software updates. Both parts are "
+        "essential to its operation.")
+
+    doc.add_heading("Intended use", level=2)
+    add_bullets(doc, [
+        "Clinical setting: radiology departments in hospitals",
+        "Primary users: radiologists, biomedical engineers, IT administrators",
+        "Regulatory classification: Class II medical device (EU MDR Class IIb, FDA 510(k))",
+    ])
+
+    # --- Components ---
+    doc.add_heading("System components", level=2)
+    doc.add_heading("On-premise (hospital)", level=3)
+    add_info_table(doc,
+                   ["Component", "Description"],
+                   [
+                       ["Imaging unit", "Physical MRI scanner with embedded firmware "
+                        "(proprietary operating system)"],
+                       ["Acquisition workstation", "PC connected to the imaging unit. Runs the "
+                        "scanning software and a local admin console accessible on the hospital "
+                        "network."],
+                       ["Local DICOM server", "Stores scan images on-site. Connected to the "
+                        "hospital network."],
+                   ])
+    doc.add_heading("Cloud (MediScanTech-operated)", level=3)
+    add_info_table(doc,
+                   ["Component", "Description"],
+                   [
+                       ["AI inference service", "Receives anonymised scan images, runs the AI "
+                        "diagnostic model, and returns annotations"],
+                       ["Cloud storage", "Stores anonymised images and AI outputs"],
+                       ["Update delivery service", "Delivers firmware and software updates to "
+                        "on-premise components"],
+                       ["Manufacturer backend", "MediScanTech internal systems: model training, "
+                        "monitoring, remote support"],
+                   ])
+
+    # --- Data flow ---
+    doc.add_heading("How a scan works (data flow)", level=2)
+    add_numbered(doc, [
+        "Patient undergoes scan → imaging unit captures raw data",
+        "Acquisition workstation processes the raw data → creates DICOM images",
+        "Images stored on the local DICOM server",
+        "Anonymised images sent to the cloud AI inference service (encrypted)",
+        "Cloud returns AI diagnostic annotations → displayed to radiologist on the workstation",
+        "MediScanTech pushes firmware and software updates to the workstation and imaging unit",
+    ])
+
+    # --- Users ---
+    doc.add_heading("Users and roles", level=2)
+    add_info_table(doc,
+                   ["Role", "What they do", "Where they access from"],
+                   [
+                       ["Radiologist", "Views images and AI annotations, signs diagnostic reports",
+                        "Hospital workstation"],
+                       ["Biomedical engineer", "Maintains the device, accesses local admin console",
+                        "Hospital (on-site)"],
+                       ["Hospital IT admin", "Manages network and local server", "Hospital network"],
+                       ["MediScanTech support", "Remote access for diagnostics and troubleshooting",
+                        "Internet"],
+                       ["MediScanTech engineer", "Manages cloud backend and update delivery",
+                        "MediScanTech datacentre"],
+                   ])
+
+    # --- Security assumptions ---
+    doc.add_heading("Key security assumptions (read carefully)", level=2)
+    add_bullets(doc, [
+        "The acquisition workstation is connected to the internet — it talks to the cloud AI "
+        "service and receives updates",
+        "The hospital network is shared with other hospital systems (not a dedicated "
+        "medical-only network)",
+        "The local admin console has no multi-factor authentication and is reachable from "
+        "anywhere on the hospital network",
+        "Remote support uses a shared credential — one login used by all MediScanTech support "
+        "staff (known gap)",
+        "Anonymisation of images before cloud upload is done in software and has not been "
+        "independently audited",
+        "The imaging unit firmware is patched approximately every 18 months due to regulatory "
+        "constraints",
+    ])
+
+    # --- Architecture diagram ---
+    doc.add_heading("Architecture diagram", level=2)
+    add_hint(doc, "Monospaced ASCII diagram — best viewed in a fixed-width font.")
+    diagram = (
+        "┌──────────────────────────────────────────────────────────────────┐\n"
+        "│  HOSPITAL NETWORK                                                  │\n"
+        "│                                                                    │\n"
+        "│  ┌──────────────┐    USB /      ┌────────────────────────────┐     │\n"
+        "│  │  Imaging     │  Proprietary  │  Acquisition Workstation    │     │\n"
+        "│  │  Unit        │◄─────────────►│  (Windows 10)               │     │\n"
+        "│  │  (RTOS)      │   Protocol    │  Scanning software          │     │\n"
+        "│  │              │               │  Admin console (:8443)      │     │\n"
+        "│  └──────────────┘               └──────────┬─────────────────┘     │\n"
+        "│                                        Hospital LAN                 │\n"
+        "│                               ┌────────────▼───────────┐           │\n"
+        "│                               │  Local DICOM Server     │           │\n"
+        "│                               │  (stores scan images)   │           │\n"
+        "│                               └────────────────────────┘           │\n"
+        "└──────────────────────────┬────────────────────────────────────────┘\n"
+        "                           │ Internet (TLS 1.3, mutual TLS)\n"
+        "┌──────────────────────────▼────────────────────────────────────────┐\n"
+        "│  MEDISCANTECH CLOUD                                                 │\n"
+        "│  ┌──────────────────┐   ┌──────────────────┐                       │\n"
+        "│  │  AI Inference    │◄──│  Cloud Storage   │                       │\n"
+        "│  │  Service (REST)  │   │  (anon. images)  │                       │\n"
+        "│  └──────────────────┘   └──────────────────┘                       │\n"
+        "│  ┌──────────────────────────────────────────────────────────────┐ │\n"
+        "│  │  Manufacturer Backend (training, monitoring, support)         │ │\n"
+        "│  └──────────────────────────────────────────────────────────────┘ │\n"
+        "│  ┌──────────────────────────────────────────────────────────────┐ │\n"
+        "│  │  Update Delivery Service                                      │ │\n"
+        "│  └──────────────────────────────┬───────────────────────────────┘ │\n"
+        "└─────────────────────────────────┼──────────────────────────────────┘\n"
+        "                                  │ Updates (TLS, signed packages)\n"
+        "                                  ▼\n"
+        "                     [Workstation + Imaging Unit firmware]"
+    )
+    dp = doc.add_paragraph()
+    dr = dp.add_run(diagram)
+    dr.font.name = "Consolas"
+    dr.font.size = Pt(7)
+
+    # --- Trust boundaries ---
+    doc.add_heading("Trust boundaries", level=2)
+    add_info_table(doc,
+                   ["Boundary", "Between", "Notes"],
+                   [
+                       ["TB-1", "Imaging unit ↔ Acquisition workstation",
+                        "Physical/proprietary — assumed trusted within the device"],
+                       ["TB-2", "Acquisition workstation ↔ Hospital LAN",
+                        "Shared hospital network — may include non-medical systems"],
+                       ["TB-3", "Hospital LAN ↔ Local DICOM server",
+                        "Internal — should be on a dedicated VLAN but often is not"],
+                       ["TB-4", "Hospital ↔ MediScanTech cloud",
+                        "Internet — protected by mutual TLS; main external boundary"],
+                       ["TB-5", "MediScanTech backend ↔ Update service",
+                        "Internal cloud — must be authenticated and integrity-protected"],
+                   ])
+
+    # --- Data flows ---
+    doc.add_heading("Data flows", level=2)
+    add_info_table(doc,
+                   ["Data", "Sensitivity", "Path"],
+                   [
+                       ["Raw DICOM images (with patient data)", "High",
+                        "Imaging unit → Workstation → Local DICOM server"],
+                       ["Anonymised DICOM images", "Medium",
+                        "Local DICOM server → Cloud AI service → Cloud storage"],
+                       ["AI diagnostic annotations", "Medium",
+                        "Cloud → Workstation → Local DICOM server"],
+                       ["Device logs / telemetry", "Low–Medium",
+                        "Workstation → MediScanTech backend"],
+                       ["Firmware / software updates", "High (integrity)",
+                        "MediScanTech → Workstation + Imaging unit"],
+                       ["Admin credentials", "Critical",
+                        "Local admin console, remote support"],
+                   ])
+
+    # --- Interfaces ---
+    doc.add_heading("Key interfaces", level=2)
+    add_info_table(doc,
+                   ["Interface", "Protocol", "Authentication", "Notes"],
+                   [
+                       ["Imaging unit → Workstation", "Proprietary USB", "None (physical)",
+                        "Assumed trusted"],
+                       ["Workstation → Local DICOM server", "DICOM (TCP 104)", "None by default",
+                        "No built-in auth in most deployments"],
+                       ["Workstation → Cloud AI service", "HTTPS REST", "Mutual TLS + API key", ""],
+                       ["Local admin console", "HTTPS (:8443)", "Username/password", "No MFA"],
+                       ["Remote support", "VPN + SSH", "Shared credential", "Known security gap"],
+                       ["Update delivery", "HTTPS", "Package signing (RSA-2048) + TLS", ""],
+                   ])
+
+
 def main():
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else (
         Path(__file__).resolve().parents[4] / "templates" / "threat-model-template.docx"
@@ -95,8 +409,16 @@ def main():
     doc = Document()
     style_base(doc)
 
-    # ---- Title block ----
-    doc.add_heading("Threat Model — NeuroScan 3000", level=1)
+    # ---- Section 1: Introduction ----
+    add_intro_section(doc)
+    page_break(doc)
+
+    # ---- Section 2: Product & architecture ----
+    add_product_section(doc)
+    page_break(doc)
+
+    # ---- Section 3: Threat model worksheet ----
+    doc.add_heading("Threat Model Worksheet — NeuroScan 3000", level=1)
     meta = doc.add_paragraph()
     meta.add_run("Team name: ").bold = True
     meta.add_run("____________________________     ")
