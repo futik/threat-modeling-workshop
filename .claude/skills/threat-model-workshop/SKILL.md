@@ -93,6 +93,13 @@ per-team feedback using the rubric in `prompts/evaluation-system-prompt.md`
 (grounded in the FDA research), then a cross-team comparison. Teams drop their
 files in `submissions/`; this workflow does the rest.
 
+Two folders:
+- `submissions/` — **real participant work**. Git-ignored by default (only its
+  README is committed) so team submissions aren't published unless you choose to.
+  The `prepare`/`aggregate` commands default here.
+- `submissions-example/` — a **committed worked example** (three fictional teams,
+  already evaluated). Pass it explicitly as the folder argument to work on it.
+
 Inputs a team may hand back (all go in `submissions/`, named
 `threat-model-<team>.docx` or `.md`):
 - A `.docx` exported from Google Docs (most common), or
@@ -166,12 +173,25 @@ right, what most teams missed, and the biggest gap between the highest and lowes
 scoring teams. Use the batch prompt at the end of
 `prompts/evaluation-system-prompt.md` as a guide.
 
-### Generating sample submissions (for testing or a dry run)
+### The worked example (`submissions-example/`)
 
-`scripts/generate_sample_submissions.py` writes three fictional teams of varying
-quality (`team-aegis` strong, `team-meridian` medium, `team-northwind` weak) into
-`submissions/` as filled `.docx` files. Useful to exercise the whole pipeline, or
-as a worked reference set. See `submissions/README.md`.
+`submissions-example/` holds a committed, fully-evaluated sample set — three
+fictional teams (`team-aegis` strong, `team-meridian` medium, `team-northwind`
+weak) with their feedback and comparison. Use it as a reference for what the
+outputs should look like, or to exercise the pipeline without real data.
+
+`scripts/generate_sample_submissions.py` (re)writes those three `.docx` files; it
+defaults to `submissions-example/`. To evaluate that folder rather than the real
+`submissions/`, pass it explicitly:
+
+```
+python scripts/generate_sample_submissions.py                       # -> submissions-example/
+python scripts/evaluate_submissions.py prepare submissions-example
+python scripts/evaluate_submissions.py aggregate submissions-example
+```
+
+See `submissions-example/README.md`. Real participant work goes in `submissions/`
+and is git-ignored by default.
 
 ---
 
@@ -183,7 +203,7 @@ as a worked reference set. See `submissions/README.md`.
 - `scripts/extract_submission.py` — converts a filled `.docx` back to markdown
   (headings + tables) for evaluation.
 - `scripts/generate_sample_submissions.py` — writes sample filled worksheets for
-  three teams of varying quality into `submissions/` (test data / worked example).
+  three teams of varying quality into `submissions-example/` (the worked example).
 - `scripts/evaluate_submissions.py` — batch driver: `prepare` assembles per-team
   evaluation payloads; `aggregate` parses the `scores` blocks and builds the
   cross-team score matrix in `comparison-summary.md`.
@@ -200,18 +220,20 @@ as a worked reference set. See `submissions/README.md`.
 - `prompts/threat-model-system-prompt.md` — for generating a reference model.
 - `references/fda-cybersecurity-risk-assessment-research.md` — FDA premarket
   guidance notes; grounds dimension-6 scoring.
-- `submissions/` — where filled worksheets, feedback, and the comparison live;
-  see `submissions/README.md` for the file conventions.
+- `submissions/` — real participant worksheets, feedback, and comparison (git-
+  ignored by default); see `submissions/README.md`.
+- `submissions-example/` — the committed worked example (three fictional teams,
+  evaluated); see `submissions-example/README.md`.
 
 ## Notes
 
 - The batch workflow keeps deterministic work in Python (`evaluate_submissions.py`)
   and judgement in the LLM, so payloads and score maths are repeatable while the
   assessment stays qualitative.
-- Committed sample data (`submissions/threat-model-*`, `feedback-*`,
-  `comparison-summary.md`) is a worked example; real participant work can be
-  committed or kept local per the facilitator's preference. `_eval-input-*.md`
-  intermediates are git-ignored.
+- The worked example in `submissions-example/` is committed; real participant
+  work in `submissions/` is git-ignored by default (only its README is tracked)
+  and can be committed per the facilitator's preference. `_eval-input-*.md`
+  intermediates are git-ignored in both folders.
 - Requirements: `python-docx` (all scripts) and `matplotlib`
   (`generate_template_docx.py` only, for the diagram).
 - Nothing here requires a network connector. The Google Docs step is a manual

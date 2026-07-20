@@ -1,37 +1,52 @@
 # Submissions
 
-Where participant threat-model worksheets are collected and evaluated after the
-workshop. The files here are a **worked sample set** (three fictional teams of
-varying quality) that demonstrate the batch-evaluation workflow end to end.
+Drop **real participant submissions** here after the workshop, then run the
+batch-evaluation workflow over them.
 
-## What's here
+Looking for a worked example? See [`../submissions-example/`](../submissions-example/),
+which contains three fictional teams already evaluated end to end.
 
-| File pattern | What it is | Produced by |
-|---|---|---|
-| `threat-model-<team>.docx` | A team's filled worksheet (what a team uploads) | teams — or `generate_sample_submissions.py` for the samples |
-| `threat-model-<team>.md` | Markdown extraction of the `.docx` (for evaluation) | `extract_submission.py` (called by `evaluate_submissions.py prepare`) |
-| `feedback-<team>.md` | Per-team rubric feedback + machine-readable `scores` block | the LLM applying `prompts/evaluation-system-prompt.md` |
-| `comparison-summary.md` | Cross-team score matrix + narrative comparison | `evaluate_submissions.py aggregate` (matrix) + LLM (narrative) |
-| `_eval-input-<team>.md` | Assembled prompt payload (system prompt + scenario + submission) | `evaluate_submissions.py prepare` — git-ignored, regenerable |
+## How teams submit
 
-## Workflow (see the `threat-model-workshop` skill, Mode B)
-
-1. Teams drop their exported `threat-model-<team>.docx` files in this folder.
-2. `python scripts/evaluate_submissions.py prepare` — extracts each `.docx` to
-   markdown and writes an `_eval-input-<team>.md` payload per team.
-3. The LLM reads each payload, applies the rubric (grounded in the FDA research),
-   and writes `feedback-<team>.md` including a ```scores``` block.
-4. `python scripts/evaluate_submissions.py aggregate` — parses the score blocks
-   and writes the cross-team matrix into `comparison-summary.md`; the LLM adds the
-   narrative comparison around it.
-
-## Regenerating the sample set
+Each team exports their filled worksheet from Google Docs and drops it here as:
 
 ```
-python scripts/generate_sample_submissions.py   # rewrites the three sample .docx files
-python scripts/evaluate_submissions.py prepare
-# (LLM writes feedback-*.md)
-python scripts/evaluate_submissions.py aggregate
+submissions/threat-model-<team>.docx
 ```
 
-Scripts live in `.claude/skills/threat-model-workshop/scripts/`.
+(A `.md` export or a PDF converted to `threat-model-<team>.md` also works.)
+
+## Evaluating (see the `threat-model-workshop` skill, Mode B)
+
+```
+# 1. Extract each .docx and assemble per-team evaluation payloads
+python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py prepare
+
+# 2. The LLM reads each submissions/_eval-input-<team>.md, applies the rubric,
+#    and writes submissions/feedback-<team>.md (with a machine-readable scores block)
+
+# 3. Aggregate the scores into the cross-team comparison
+python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py aggregate
+```
+
+`prepare` and `aggregate` default to this `submissions/` folder. To evaluate a
+different folder (e.g. the example set), pass it as an argument:
+
+```
+python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py prepare submissions-example
+python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py aggregate submissions-example
+```
+
+## What ends up here
+
+| File pattern | What it is |
+|---|---|
+| `threat-model-<team>.docx` | A team's uploaded worksheet |
+| `threat-model-<team>.md` | Markdown extraction (produced by `prepare`) |
+| `feedback-<team>.md` | Per-team rubric feedback + `scores` block (written by the LLM) |
+| `comparison-summary.md` | Cross-team score matrix + narrative (matrix by `aggregate`, narrative by the LLM) |
+| `_eval-input-<team>.md` | Assembled prompt payload — git-ignored, regenerable |
+
+Real team files other than this README are git-ignored by default so participant
+work isn't committed unless you choose to. Adjust `.gitignore` if you want to keep
+them.
