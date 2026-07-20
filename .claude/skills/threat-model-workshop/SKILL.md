@@ -3,11 +3,13 @@ name: threat-model-workshop
 description: >
   Run the medical-device threat-modeling workshop's document workflow. Use when
   the user wants to (1) generate the participant threat-model worksheet as a
-  Google-Docs-friendly .docx for teams to fill in, or (2) evaluate completed
-  participant threat models (submitted as .docx or Google Docs export) and
-  produce structured AI feedback and a cross-team comparison. Triggers: "generate
-  the workshop template", "make the participant docx", "evaluate the threat
-  models", "score the submissions", "give feedback on the team templates".
+  Google-Docs-friendly .docx for teams to fill in, or (2) batch-evaluate completed
+  participant threat models (submitted as .docx or Google Docs export) — iterating
+  over every team in submissions/, scoring each against the rubric and FDA
+  research, and producing per-team feedback plus a cross-team comparison report.
+  Triggers: "generate the workshop template", "make the participant docx",
+  "evaluate the threat models", "score the submissions", "give feedback on the
+  team templates", "compare the teams".
 ---
 
 # Threat Model Workshop — Template & Evaluation
@@ -84,33 +86,61 @@ embedded images for diagrams.
 
 ---
 
-## Mode B — Evaluate completed submissions
+## Mode B — Batch-evaluate submissions and compare teams
 
-**Goal:** for each team's filled worksheet, produce structured feedback using the
-rubric in `prompts/evaluation-system-prompt.md`, then a cross-team comparison.
+**Goal:** iterate over every team's filled worksheet in `submissions/`, produce
+per-team feedback using the rubric in `prompts/evaluation-system-prompt.md`
+(grounded in the FDA research), then a cross-team comparison. Teams drop their
+files in `submissions/`; this workflow does the rest.
 
-Inputs a team may hand back:
-- A `.docx` exported from Google Docs, or
-- A PDF export, or
-- The markdown `threat-model-[team-name].md`.
+Inputs a team may hand back (all go in `submissions/`, named
+`threat-model-<team>.docx` or `.md`):
+- A `.docx` exported from Google Docs (most common), or
+- A PDF export (convert to text first with the `pdf` skill, save as
+  `threat-model-<team>.md`), or
+- The markdown worksheet directly.
 
-Steps per submission:
+The split between deterministic plumbing (Python) and judgement (the LLM):
+`evaluate_submissions.py` handles discovery, `.docx`→markdown extraction, prompt
+assembly, and score maths so those are consistent and repeatable. The LLM does
+the qualitative scoring and writes the prose.
 
-1. **Get the text.** For `.docx`, run:
-   `python scripts/extract_submission.py <submission.docx> submission-[team].md`
-   This preserves headings and tables as markdown. For PDF, use the `pdf` skill to
-   extract text; for `.md`, read it directly.
-2. **Load the context.** Read `scenario/device-overview.md` and
-   `scenario/system-architecture.md` so the evaluation is grounded in the actual
-   system.
-3. **Apply the rubric.** Use the system prompt in
-   `prompts/evaluation-system-prompt.md` verbatim as the evaluation instruction.
-   Evaluate the six dimensions (scope, threat coverage, threat quality, risk
-   assessment, mitigation quality, regulatory & medical awareness), each 1–5.
-4. **Write feedback** to `submissions/feedback-[team-name].md` in the output
-   format the prompt defines (overall score, dimension table, strengths, gaps &
-   missed threats, improvement suggestions, notable observations). Be specific and
-   reference the team's actual content; frame it to help them learn, not to grade.
+### Step 1 — prepare the payloads
+
+```
+python scripts/evaluate_submissions.py prepare
+```
+
+This discovers every `threat-model-*` submission, runs `extract_submission.py` on
+each `.docx`, and writes one assembled payload per team to
+`submissions/_eval-input-<team>.md`. Each payload contains, in order: the
+evaluation system prompt, the scenario (device overview + architecture), and that
+team's submission. (`_eval-input-*.md` files are git-ignored — they are
+regenerable intermediates.)
+
+### Step 2 — evaluate each team (LLM)
+
+For each `submissions/_eval-input-<team>.md`, apply the rubric and write
+`submissions/feedback-<team>.md`. Use the output format from
+`prompts/evaluation-system-prompt.md` (overall score, dimension table, strengths,
+gaps & missed threats, improvement suggestions, notable observations), and **end
+the file with a machine-readable scores block** so Step 3 can aggregate it:
+
+````
+```scores
+scope: 5
+threat_coverage: 5
+threat_quality: 5
+risk_assessment: 5
+mitigation_quality: 4
+regulatory_awareness: 5
+total: 29
+```
+````
+
+The six keys are the six rubric dimensions (each 1–5); `total` is out of 30. Be
+specific and reference the team's actual content; frame it to help them learn, not
+to grade.
 
 **FDA-awareness scoring note.** When scoring dimension 6 (regulatory & medical
 awareness), reward teams that: treat security risk as exploitability-based rather
@@ -120,14 +150,28 @@ across the lifecycle. These map to the FDA premarket guidance (see
 `references/fda-cybersecurity-risk-assessment-research.md` and
 `workshop/fda-supportive-notes.md`).
 
-### Cross-team comparison
+### Step 3 — aggregate and compare
 
-After evaluating all teams, produce a comparison:
-1. Build a table of team names and their six dimension scores + total.
-2. Use the batch prompt at the end of `prompts/evaluation-system-prompt.md` to
-   write a 2–3 paragraph summary: what most teams got right, what most teams
-   missed, and the biggest gap between the highest and lowest scoring teams.
-3. Save as `submissions/comparison-summary.md`.
+```
+python scripts/evaluate_submissions.py aggregate
+```
+
+This parses the `scores` block from every `feedback-<team>.md`, builds the
+cross-team score matrix (ranked, with per-dimension averages), and writes it into
+`submissions/comparison-summary.md` between the `SCORE-MATRIX` markers. Re-running
+is idempotent — it updates the matrix in place without disturbing the narrative.
+
+Then (LLM) write the narrative comparison around the matrix: what most teams got
+right, what most teams missed, and the biggest gap between the highest and lowest
+scoring teams. Use the batch prompt at the end of
+`prompts/evaluation-system-prompt.md` as a guide.
+
+### Generating sample submissions (for testing or a dry run)
+
+`scripts/generate_sample_submissions.py` writes three fictional teams of varying
+quality (`team-aegis` strong, `team-meridian` medium, `team-northwind` weak) into
+`submissions/` as filled `.docx` files. Useful to exercise the whole pipeline, or
+as a worked reference set. See `submissions/README.md`.
 
 ---
 
@@ -138,6 +182,11 @@ After evaluating all teams, produce a comparison:
   diagram rendered as an embedded PNG.
 - `scripts/extract_submission.py` — converts a filled `.docx` back to markdown
   (headings + tables) for evaluation.
+- `scripts/generate_sample_submissions.py` — writes sample filled worksheets for
+  three teams of varying quality into `submissions/` (test data / worked example).
+- `scripts/evaluate_submissions.py` — batch driver: `prepare` assembles per-team
+  evaluation payloads; `aggregate` parses the `scores` blocks and builds the
+  cross-team score matrix in `comparison-summary.md`.
 
 ## Related repo files (not part of this skill, but used by it)
 
@@ -149,12 +198,22 @@ After evaluating all teams, produce a comparison:
   the Product & Architecture section.
 - `prompts/evaluation-system-prompt.md` — the evaluation rubric and output format.
 - `prompts/threat-model-system-prompt.md` — for generating a reference model.
-- `submissions/` — where filled worksheets and generated feedback live.
+- `references/fda-cybersecurity-risk-assessment-research.md` — FDA premarket
+  guidance notes; grounds dimension-6 scoring.
+- `submissions/` — where filled worksheets, feedback, and the comparison live;
+  see `submissions/README.md` for the file conventions.
 
 ## Notes
 
-- `submissions/` may be git-ignored or committed depending on how the facilitator
-  wants to handle participant work; the skill does not assume either.
+- The batch workflow keeps deterministic work in Python (`evaluate_submissions.py`)
+  and judgement in the LLM, so payloads and score maths are repeatable while the
+  assessment stays qualitative.
+- Committed sample data (`submissions/threat-model-*`, `feedback-*`,
+  `comparison-summary.md`) is a worked example; real participant work can be
+  committed or kept local per the facilitator's preference. `_eval-input-*.md`
+  intermediates are git-ignored.
+- Requirements: `python-docx` (all scripts) and `matplotlib`
+  (`generate_template_docx.py` only, for the diagram).
 - Nothing here requires a network connector. The Google Docs step is a manual
   upload/download by participants, which keeps the workshop robust to conference
   Wi-Fi and account restrictions.
