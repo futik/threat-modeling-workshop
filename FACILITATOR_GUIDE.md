@@ -177,9 +177,9 @@ Other groups: ask one question — *"Did you consider X?"*
 **Facilitator role:** note themes across groups; call out threats that only one group found; highlight where groups disagreed on risk scores.
 
 **Seed example — what a strong review looks like (reveal after groups present):**
-- *Top 3:* T-04 no-MFA admin console · T-07 shared remote-support credential · T-03 unencrypted DICOM on the LAN
-- *Most surprising:* T-09 — a rogue insider silently altering the cloud AI model, biasing results across thousands of patients
-- *Hardest trade-off:* T-01 firmware integrity — a proper fix (secure boot) needs a hardware revision and a new 510(k), so the interim is signed update packages + integrity checks
+- *Top 3:* S-04 no-MFA admin console · S-07 shared remote-support credential · S-03 unencrypted DICOM on the LAN
+- *Most surprising:* S-09 — a rogue insider silently altering the cloud AI model, biasing results across thousands of patients
+- *Hardest trade-off:* S-01 firmware integrity — a proper fix (secure boot) needs a hardware revision and a new 510(k), so the interim is signed update packages + integrity checks
 - *Open question logged:* what is the SLA to rotate the shared remote-support credential?
 
 **FDA lens — a living document across the TPLC.** Threat modeling and risk assessment must be **maintained throughout the Total Product Life Cycle** — not a one-time premarket artifact (§V.A.6, §VII.C.1). The statutory hook is the word **"maintain"** in §524B(b)(2).

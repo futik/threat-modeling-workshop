@@ -66,37 +66,50 @@
 
 ---
 
-## Section 2: Threat Identification
+## Section 2: Threat Identification (Attacker Stories)
 
-| Threat ID | STRIDE category | ATT&CK technique | Threat statement | Component / data flow affected |
-|-----------|----------------|-----------------|-----------------|-------------------------------|
-| T-01 | Tampering | T0839 Module Firmware | An attacker with access to the update delivery service can push a malicious firmware update to the imaging unit, causing persistent compromise of the device including sensor data manipulation | Update delivery → Imaging unit firmware |
-| T-02 | Spoofing | T0865 Spearphishing | An external attacker can spear-phish a MediScanTech engineer, hijack their cloud credentials, and impersonate MediScanTech services, causing falsified AI annotations to be sent to the workstation | Cloud AI inference service |
-| T-03 | Tampering | T0831 Manipulation of Control | An attacker on the hospital LAN can intercept unencrypted DICOM traffic between the workstation and local DICOM server and modify image data, causing the AI and radiologist to diagnose from corrupted images | Workstation ↔ DICOM server (TB-3) |
-| T-04 | Elevation of privilege | T0859 Valid Accounts | An attacker can brute-force the local admin console (no MFA, no rate limiting) and gain administrator access to the acquisition workstation, enabling further compromise of the entire system | Local admin console (:8443) |
-| T-05 | Information disclosure | T0830 Man in the Middle | A MediScanTech insider can access anonymized images in cloud storage and perform re-identification using external demographic data, causing a patient privacy breach | Cloud storage |
-| T-06 | Denial of service | T0814 Denial of Service | An external attacker can flood the cloud AI inference service with requests, preventing it from returning annotations during active scans, causing clinical workflow disruption | Cloud AI inference service |
-| T-07 | Spoofing | — | An attacker with network access can use the shared remote support credential to open an SSH session to the acquisition workstation, gaining full control without detection | Remote support interface |
-| T-08 | Repudiation | — | An attacker who gains access to the local admin console can clear audit logs, preventing forensic attribution of their actions | Local DICOM server + workstation logs |
-| T-09 | Tampering | T0836 Modify Parameter | A rogue MediScanTech engineer can modify the AI model weights in the cloud, causing the inference service to systematically misclassify specific lesion types | Cloud AI inference service (model) |
-| T-10 | Information disclosure | — | The acquisition workstation's anonymization software may fail to scrub PHI embedded in DICOM pixel data (burned-in annotations), resulting in PHI being transmitted to the cloud | Workstation → Cloud (anonymization boundary) |
+This workshop uses **attacker stories** as the primary way to identify threats.
+Each story follows the format the worksheet asks participants to use:
+
+> **As a** [bad actor], **I want to** [do something bad] **via** [method or entry point], **so that** [I achieve my goal].
+
+The **Story ID**, **Bad actor**, **Attacker story**, **Part of system affected**,
+and **Impact type (S/P/A)** columns are the ones participants fill in. The two
+right-hand columns (STRIDE, ATT&CK) are *optional supporting information* — a way
+to sanity-check coverage after the stories are written, not a required input. Fill
+in the stories first; the STRIDE/ATT&CK tags come second.
+
+**Impact type:** **S** = patient safety (physical harm) · **P** = privacy / PHI · **A** = availability.
+
+| Story ID | Bad actor | Attacker story | Part of system affected | Impact type (S/P/A) | STRIDE (optional) | ATT&CK (optional) |
+|----------|-----------|----------------|-------------------------|---------------------|-------------------|-------------------|
+| S-01 | External attacker | As an attacker with access to the update delivery service, I want to push a malicious firmware update to the imaging unit, so that I persistently compromise the device and can manipulate sensor/scan data | Update delivery → imaging unit firmware | S | Tampering | T0839 Module Firmware |
+| S-02 | External attacker | As an attacker, I want to spear-phish a MediScanTech engineer and hijack their cloud credentials, so that I can impersonate MediScanTech services and send falsified AI annotations to the workstation | Cloud AI inference service | S | Spoofing | T0865 Spearphishing |
+| S-03 | Opportunistic attacker | As an attacker with a hospital-LAN foothold, I want to intercept and modify unencrypted DICOM traffic between the workstation and the local DICOM server, so that the AI and radiologist diagnose from corrupted images | Workstation ↔ DICOM server (TB-3) | S | Tampering | T0831 Manipulation of Control |
+| S-04 | External attacker | As an attacker on the hospital LAN, I want to brute-force the local admin console (no MFA, no rate limiting), so that I gain administrator access to the acquisition workstation and can pivot across the system | Local admin console (:8443) | S | Elevation of privilege | T0859 Valid Accounts |
+| S-05 | Malicious insider (MediScanTech) | As a MediScanTech insider, I want to access anonymized images in cloud storage and re-identify them using external demographic data, so that I breach patient privacy at scale | Cloud storage | P | Information disclosure | T0830 Man in the Middle |
+| S-06 | External attacker | As an attacker, I want to flood the cloud AI inference service with requests, so that it cannot return annotations during active scans and clinical workflow is disrupted | Cloud AI inference service | A | Denial of service | T0814 Denial of Service |
+| S-07 | Rogue vendor technician | As a support technician, I want to use the shared remote-support credential to open an SSH session to the workstation, so that I gain full control without detection | Remote support interface | S | Spoofing | — |
+| S-08 | Malicious insider | As an attacker who has gained admin access, I want to clear the audit logs on the workstation and DICOM server, so that my actions cannot be attributed | Local DICOM server + workstation logs | P | Repudiation | — |
+| S-09 | Rogue MediScanTech engineer | As a cloud engineer, I want to modify the AI model weights, so that the inference service systematically misclassifies specific lesion types across all hospitals | Cloud AI inference service (model) | S | Tampering | T0836 Modify Parameter |
+| S-10 | Opportunistic attacker | As an attacker, I want to exploit weak anonymization (burned-in PHI in DICOM pixel data), so that PHI is transmitted to the cloud in the clear | Workstation → cloud (anonymization boundary) | P | Information disclosure | — |
 
 ---
 
 ## Section 3: Risk Assessment
 
-| Threat ID | Exploitability | Exploitability rationale | Severity | Severity rationale | Score | Safety override? | Priority |
-|-----------|-----------|---------------------|--------|-----------------|-------|----------------|---------|
-| T-01 | 2 | Requires compromising the update delivery pipeline — non-trivial but supply chain attacks are well-documented | 3 | Persistent firmware compromise gives attacker full control; could alter scan behavior | 6 | Yes — manipulated scans directly endanger patients | **High** |
-| T-02 | 2 | Spear phishing is common; cloud credential compromise is high-value target | 3 | AI annotation tampering could lead radiologist to misdiagnosis | 6 | Yes | **High** |
-| T-03 | 2 | Hospital LAN foothold is achievable via phishing; DICOM is often unencrypted | 3 | Corrupted images used for diagnosis | 6 | Yes | **High** |
-| T-04 | 3 | No MFA, no rate limiting, accessible from entire hospital LAN — easy to brute-force | 3 | Full workstation control, pivot to all connected systems | 9 | Yes | **High** |
-| T-05 | 1 | Requires sophisticated insider with access + external data for re-identification | 2 | Serious privacy breach; regulatory consequences | 2 | No | **Medium** |
-| T-06 | 2 | Cloud DoS is easy to attempt; API endpoint may not be rate-limited | 2 | Clinical disruption but radiologist can still work without AI (compensating) | 4 | No | **Medium** |
-| T-07 | 2 | Shared credential may be known to multiple people; no MFA | 3 | Full workstation access, undetectable without logging | 6 | Yes — could be used to alter device behavior during scan | **High** |
-| T-08 | 2 | Attacker already needs admin access; log clearing is easy once inside | 1 | Forensics impacted, but no direct harm | 2 | No | **Low** |
-| T-09 | 1 | Requires privileged insider with model deployment access; difficult to conceal | 3 | Systematic misclassification across all hospitals — severe patient harm | 3 | Yes — escalate | **High** |
-| T-10 | 2 | Known issue class; anonymization bugs are frequently discovered in DICOM software | 2 | Privacy breach; potential GDPR fine; reputational damage | 4 | No | **Medium** |
+| Story ID | Exploitability | Exploitability rationale | Severity | Severity rationale | Score | Safety override? | Priority |
+|----------|-----------|---------------------|--------|-----------------|-------|----------------|---------|
+| S-01 | 2 | Requires compromising the update delivery pipeline — non-trivial but supply chain attacks are well-documented | 3 | Persistent firmware compromise gives attacker full control; could alter scan behavior | 6 | Yes — manipulated scans directly endanger patients | **High** |
+| S-02 | 2 | Spear phishing is common; cloud credential compromise is high-value target | 3 | AI annotation tampering could lead radiologist to misdiagnosis | 6 | Yes | **High** |
+| S-03 | 2 | Hospital LAN foothold is achievable via phishing; DICOM is often unencrypted | 3 | Corrupted images used for diagnosis | 6 | Yes | **High** |
+| S-04 | 3 | No MFA, no rate limiting, accessible from entire hospital LAN — easy to brute-force | 3 | Full workstation control, pivot to all connected systems | 9 | Yes | **High** |
+| S-05 | 1 | Requires sophisticated insider with access + external data for re-identification | 2 | Serious privacy breach; regulatory consequences | 2 | No | **Medium** |
+| S-06 | 2 | Cloud DoS is easy to attempt; API endpoint may not be rate-limited | 2 | Clinical disruption but radiologist can still work without AI (compensating) | 4 | No | **Medium** |
+| S-07 | 2 | Shared credential may be known to multiple people; no MFA | 3 | Full workstation access, undetectable without logging | 6 | Yes — could be used to alter device behavior during scan | **High** |
+| S-08 | 2 | Attacker already needs admin access; log clearing is easy once inside | 1 | Forensics impacted, but no direct harm | 2 | No | **Low** |
+| S-09 | 1 | Requires privileged insider with model deployment access; difficult to conceal | 3 | Systematic misclassification across all hospitals — severe patient harm | 3 | Yes — escalate | **High** |
+| S-10 | 2 | Known issue class; anonymization bugs are frequently discovered in DICOM software | 2 | Privacy breach; potential GDPR fine; reputational damage | 4 | No | **Medium** |
 
 ---
 
@@ -104,12 +117,12 @@
 
 | Mitigation ID | Addresses | Type | Description | Residual risk | Regulatory note |
 |--------------|-----------|------|-------------|--------------|----------------|
-| M-01 | T-04, T-07 | Preventive | Enforce TOTP-based MFA on local admin console and remote support accounts; replace shared remote support credential with per-engineer PKI certificates; rate-limit login attempts (5/min, 30-min lockout) | Credential theft still possible if device is compromised; MFA bypass via SIM swap | Software change only — likely no new clearance required |
-| M-02 | T-03 | Preventive | Enable DICOM TLS (DICOM over TLS, port 2762) on all local DICOM connections; restrict DICOM connections to allowlisted workstation IP/MAC | Compromised workstation can still send malicious data once on the allowlist | Configuration change — document in security documentation |
-| M-03 | T-01, T-09 | Detective + Preventive | Implement cryptographic signing of AI inference responses (vendor-signed JWS); workstation verifies signature before displaying annotations; log all model version transitions in cloud | Compromised signing key still allows tampering | May require design change — evaluate FDA impact |
-| M-04 | T-02 | Preventive | Enforce hardware MFA (FIDO2) for all MediScanTech engineer cloud accounts; implement just-in-time access for production cloud systems | Phishing of backup codes possible | Internal process change |
-| M-05 | T-10 | Detective | Integrate a third-party DICOM anonymization audit tool that checks for burned-in PHI in pixel data before upload; log any detected and blocked uploads | Zero-day anonymization failures not caught until tool is updated | Software change — add to design verification |
-| M-06 | T-06 | Corrective | Implement graceful degradation mode: if cloud AI is unavailable for >60s, display clear warning to radiologist and allow scan to proceed with manual-only review; alert on-call engineer | Radiologist workflow affected; no AI assistance during degradation | Software change |
+| M-01 | S-04, S-07 | Preventive | Enforce TOTP-based MFA on local admin console and remote support accounts; replace shared remote support credential with per-engineer PKI certificates; rate-limit login attempts (5/min, 30-min lockout) | Credential theft still possible if device is compromised; MFA bypass via SIM swap | Software change only — likely no new clearance required |
+| M-02 | S-03 | Preventive | Enable DICOM TLS (DICOM over TLS, port 2762) on all local DICOM connections; restrict DICOM connections to allowlisted workstation IP/MAC | Compromised workstation can still send malicious data once on the allowlist | Configuration change — document in security documentation |
+| M-03 | S-01, S-09 | Detective + Preventive | Implement cryptographic signing of AI inference responses (vendor-signed JWS); workstation verifies signature before displaying annotations; log all model version transitions in cloud | Compromised signing key still allows tampering | May require design change — evaluate FDA impact |
+| M-04 | S-02 | Preventive | Enforce hardware MFA (FIDO2) for all MediScanTech engineer cloud accounts; implement just-in-time access for production cloud systems | Phishing of backup codes possible | Internal process change |
+| M-05 | S-10 | Detective | Integrate a third-party DICOM anonymization audit tool that checks for burned-in PHI in pixel data before upload; log any detected and blocked uploads | Zero-day anonymization failures not caught until tool is updated | Software change — add to design verification |
+| M-06 | S-06 | Corrective | Implement graceful degradation mode: if cloud AI is unavailable for >60s, display clear warning to radiologist and allow scan to proceed with manual-only review; alert on-call engineer | Radiologist workflow affected; no AI assistance during degradation | Software change |
 
 ---
 
@@ -117,20 +130,20 @@
 
 ### Top 3 highest-risk threats
 
-1. **T-04**: No MFA on admin console with hospital-wide LAN access — trivial to exploit, full system compromise
-2. **T-07**: Shared remote support credential — persistent, undetectable access possible
-3. **T-03**: Unencrypted DICOM traffic on hospital LAN — image manipulation can directly cause misdiagnosis
+1. **S-04**: No MFA on admin console with hospital-wide LAN access — trivial to exploit, full system compromise
+2. **S-07**: Shared remote support credential — persistent, undetectable access possible
+3. **S-03**: Unencrypted DICOM traffic on hospital LAN — image manipulation can directly cause misdiagnosis
 
 ### Most surprising or unexpected threat
 
-> **T-09** — Model weight manipulation by a rogue insider. The AI model is a black box to the hospital, runs on infrastructure the hospital doesn't control, and a systematic bias in its output might go undetected for months across thousands of patients. This is a novel threat class that doesn't have a clear precedent in traditional medical device threat modeling.
+> **S-09** — Model weight manipulation by a rogue insider. The AI model is a black box to the hospital, runs on infrastructure the hospital doesn't control, and a systematic bias in its output might go undetected for months across thousands of patients. This is a novel threat class that doesn't have a clear precedent in traditional medical device threat modeling.
 
 ### Hardest mitigation trade-off
 
-> Fixing **T-01** (malicious firmware update) properly requires secure boot with a hardware root of trust. This would require a hardware revision to the imaging unit — triggering a new FDA 510(k) submission. The alternative (software-only integrity checks) is weaker. We opted for a detective compensating control (signed update packages + post-update integrity hash verification) as an interim measure while planning the hardware revision.
+> Fixing **S-01** (malicious firmware update) properly requires secure boot with a hardware root of trust. This would require a hardware revision to the imaging unit — triggering a new FDA 510(k) submission. The alternative (software-only integrity checks) is weaker. We opted for a detective compensating control (signed update packages + post-update integrity hash verification) as an interim measure while planning the hardware revision.
 
 ### Open questions
 
-- What is MediScanTech's SLA for rotating the shared remote support credential (T-07)?
-- Has the anonymization software (T-10) ever been independently audited?
+- What is MediScanTech's SLA for rotating the shared remote support credential (S-07)?
+- Has the anonymization software (S-10) ever been independently audited?
 - Does the cloud AI service have its own threat model? Is it shared with hospitals?

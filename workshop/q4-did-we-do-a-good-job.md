@@ -10,8 +10,8 @@ A threat model only has value if it is complete, clearly communicated, and kept 
 
 Before submitting, review your completed template against this checklist:
 
-- [ ] Every threat has a unique ID (T-01, T-02, ...)
-- [ ] Every threat has a structured threat statement (actor → action → asset → impact)
+- [ ] Every attacker story has a unique ID (S-01, S-02, ...)
+- [ ] Every attacker story follows the format (as a [actor] → I want to [action] → via [method] → so that [goal])
 - [ ] Every threat has a likelihood, impact, and risk score
 - [ ] Patient safety overrides are noted with rationale
 - [ ] Every High-risk threat has at least one mitigation
