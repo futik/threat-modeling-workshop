@@ -25,6 +25,7 @@
 - **Anonymisation failure (burned-in PHI in pixel data)** — not considered; a known DICOM issue class directly relevant to the cloud upload boundary.
 - **Repudiation / audit-log tampering** — no story about an attacker covering their tracks.
 - **Supply-chain / third-party component vulnerability (SBOM)** — absent; required under §524B.
+- **Hospital EMR interface (TB-6)** — the partially-trusted EMR boundary is neither listed nor defended; malformed HL7 FHIR input from a compromised EMR (parser exploit / corrupted order data) is an unmodelled entry point into the workstation.
 
 ### Improvement suggestions
 

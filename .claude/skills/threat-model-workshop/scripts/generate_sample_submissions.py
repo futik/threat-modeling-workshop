@@ -156,7 +156,8 @@ TEAM_AEGIS = {
     ],
     "out_scope": [
         "Hospital EMR/HIS — separate procurement and governance; modelled as a "
-        "partially-trusted external system",
+        "partially-trusted external system (boundary TB-6). We do not own it, but we "
+        "validate all data crossing the EMR interface as untrusted input",
         "Hospital network hardware (switches, firewalls) — outside MediScanTech control; "
         "treated as the threat boundary rather than a controlled component",
     ],
@@ -187,6 +188,8 @@ TEAM_AEGIS = {
          "Internet-facing"],
         ["Update delivery", "Signed package pull over HTTPS", "Package signing (RSA-2048)",
          "TLS 1.3", "Internet-facing"],
+        ["Workstation ↔ Hospital EMR (TB-6)", "HL7 FHIR over HTTPS", "OAuth 2.0", "TLS 1.3",
+         "Partially-trusted external system"],
         ["Imaging unit ↔ Workstation", "Proprietary USB", "None (physical)", "None",
          "Physical access on-site"],
     ],
@@ -233,6 +236,10 @@ TEAM_AEGIS = {
         ["S-10", "Malicious insider", "As an admin-level attacker, I want to clear the audit "
          "logs on the workstation and DICOM server, so that my actions cannot be attributed.",
          "Workstation + DICOM logs", "P"],
+        ["S-11", "External attacker (via hospital EMR)", "As an attacker who has compromised the "
+         "partially-trusted hospital EMR, I want to send malformed HL7 FHIR messages across the "
+         "EMR interface to the workstation, so that I exploit a parser flaw to run code or feed "
+         "corrupted patient/order data into a scan.", "Workstation ↔ EMR (TB-6)", "S"],
     ],
     "risk": [
         ["S-01", "3", "Phishing is trivial; workstation is internet-connected", "3",
@@ -256,6 +263,9 @@ TEAM_AEGIS = {
          "PHI breach; GDPR exposure", "4", "No", "Medium"],
         ["S-10", "2", "Needs prior admin access; log clearing then trivial", "1",
          "Forensics impaired; no direct harm alone", "2", "No", "Low"],
+        ["S-11", "2", "EMR is partially-trusted and outside our control; HL7/FHIR parser flaws "
+         "are a known class", "3", "Code execution on the workstation or corrupted order data "
+         "used during a scan", "6", "Yes", "High"],
     ],
     "mitigations": [
         ["M-01", "S-03, S-04", "Preventive", "Enforce TOTP MFA on the admin console; replace the "
@@ -278,6 +288,12 @@ TEAM_AEGIS = {
         ["M-06", "S-08", "Compensating", "Graceful degradation: if AI is unavailable >60s, warn "
          "the radiologist and allow manual-only review; alert on-call", "No AI assistance during "
          "degradation", "Software change"],
+        ["M-07", "S-11", "Preventive", "Treat the EMR interface (TB-6) as untrusted input: strict "
+         "HL7 FHIR schema validation and sanitisation, run the FHIR parser in a sandboxed "
+         "least-privilege process, and mutually authenticate the connection (OAuth 2.0 + pinned "
+         "TLS)", "Zero-day parser flaws remain until patched; a fully compromised EMR can still "
+         "send well-formed but false data", "Software change — add interface fuzzing to design "
+         "verification"],
     ],
     "top3": [
         "1.  S-03:  No MFA on the admin console with whole-LAN reach — trivial full compromise",

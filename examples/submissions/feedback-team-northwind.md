@@ -25,11 +25,11 @@
 - **Shared remote-support credential** — the scenario's flagged known gap is not modelled.
 - **Anonymisation failure** — PHI leaking to the cloud is not considered.
 - **Repudiation** — no audit-log/attribution threat.
-- **Every trust boundary** — TB-1..TB-5 are not identified, so LAN-foothold and cloud-boundary attacks are invisible to the model.
+- **Every trust boundary** — TB-1..TB-6 are not identified, so LAN-foothold and cloud-boundary attacks are invisible to the model.
 
 ### Improvement suggestions
 
-1. Re-scope from the architecture diagram: list the imaging unit, workstation, DICOM server, cloud AI/storage, and update delivery, and enumerate trust boundaries TB-1..TB-5. Give assets stable IDs and a specific C/I/A property.
+1. Re-scope from the architecture diagram: list the imaging unit, workstation, DICOM server, cloud AI/storage, and update delivery, and enumerate trust boundaries TB-1..TB-6. Give assets stable IDs and a specific C/I/A property.
 2. Rewrite threats in the actor→action→method→goal format, each naming a real interface (e.g. "via the unauthenticated DICOM connection on TCP/104"), and drop "viruses" as an actor.
 3. Replace the High/Med/Low guesses with **Exploitability (1–3) × Severity (1–3)** and write the rationale in terms of *how feasible the attack is*, not how common hackers are. Mark any patient-harming story High regardless of score.
 4. Make every mitigation specific: not "add encryption" but "enable DICOM-over-TLS on port 2762 between the workstation and DICOM server"; not "strong passwords" but "TOTP MFA on the :8443 admin console with lockout". Note residual risk on each.

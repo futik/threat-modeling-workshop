@@ -21,7 +21,7 @@
 - All network interfaces and data flows between the above
 
 **Out of scope (with rationale):**
-- Hospital EMR/HIS — owned by the hospital, separate procurement and security governance; treated as a partially-trusted external system
+- Hospital EMR/HIS — owned by the hospital, separate procurement and security governance; treated as a partially-trusted external system (boundary TB-6)
 - Hospital network infrastructure (switches, firewalls) — out of manufacturer control; modeled as the threat boundary, not a controlled component
 
 ---
@@ -47,7 +47,7 @@
 | Imaging unit ↔ Workstation | Proprietary USB | None | None | Trusted (physical) |
 | Workstation ↔ Local DICOM server | DICOM TCP/104 | None (default) | None (default) | Semi-trusted (hospital LAN) |
 | Workstation ↔ Cloud AI service | HTTPS REST | Mutual TLS + API key | TLS 1.3 | Untrusted (internet) |
-| Workstation ↔ EMR | HTTPS HL7 FHIR | OAuth 2.0 | TLS 1.3 | Untrusted (external system) |
+| Workstation ↔ EMR (TB-6) | HTTPS HL7 FHIR | OAuth 2.0 | TLS 1.3 | Partially-trusted (external system) |
 | Local admin console (:8443) | HTTPS | Username/password (no MFA) | TLS | Semi-trusted (hospital LAN) |
 | Cloud analytics dashboard | HTTPS | SSO (SAML) | TLS 1.3 | Untrusted (internet) |
 | Remote support | VPN + SSH | Shared credential | TLS (VPN) | Untrusted (internet) — HIGH RISK |
@@ -93,6 +93,7 @@ in the stories first; the STRIDE/ATT&CK tags come second.
 | S-08 | Malicious insider | As an attacker who has gained admin access, I want to clear the audit logs on the workstation and DICOM server, so that my actions cannot be attributed | Local DICOM server + workstation logs | P | Repudiation | — |
 | S-09 | Rogue MediScanTech engineer | As a cloud engineer, I want to modify the AI model weights, so that the inference service systematically misclassifies specific lesion types across all hospitals | Cloud AI inference service (model) | S | Tampering | T0836 Modify Parameter |
 | S-10 | Opportunistic attacker | As an attacker, I want to exploit weak anonymization (burned-in PHI in DICOM pixel data), so that PHI is transmitted to the cloud in the clear | Workstation → cloud (anonymization boundary) | P | Information disclosure | — |
+| S-11 | External attacker (via hospital EMR) | As an attacker who has compromised the partially-trusted hospital EMR, I want to send malformed HL7 FHIR messages across the EMR interface to the acquisition workstation, so that I exploit a parsing flaw to execute code or corrupt patient/order data used during scanning | Workstation ↔ EMR (TB-6) | S | Tampering / Elevation of privilege | T0855 Unauthorized Command Message |
 
 ---
 
@@ -110,6 +111,7 @@ in the stories first; the STRIDE/ATT&CK tags come second.
 | S-08 | 2 | Attacker already needs admin access; log clearing is easy once inside | 1 | Forensics impacted, but no direct harm | 2 | No | **Low** |
 | S-09 | 1 | Requires privileged insider with model deployment access; difficult to conceal | 3 | Systematic misclassification across all hospitals — severe patient harm | 3 | Yes — escalate | **High** |
 | S-10 | 2 | Known issue class; anonymization bugs are frequently discovered in DICOM software | 2 | Privacy breach; potential GDPR fine; reputational damage | 4 | No | **Medium** |
+| S-11 | 2 | EMR is partially-trusted and outside our control; HL7/FHIR parser flaws are a well-known class, and an attacker only needs a foothold in the hospital EMR | 3 | Malformed input could execute code on the workstation or feed corrupted patient/order data into a scan | 6 | Yes — corrupted order data or a compromised workstation can endanger patients | **High** |
 
 ---
 
@@ -123,6 +125,7 @@ in the stories first; the STRIDE/ATT&CK tags come second.
 | M-04 | S-02 | Preventive | Enforce hardware MFA (FIDO2) for all MediScanTech engineer cloud accounts; implement just-in-time access for production cloud systems | Phishing of backup codes possible | Internal process change |
 | M-05 | S-10 | Detective | Integrate a third-party DICOM anonymization audit tool that checks for burned-in PHI in pixel data before upload; log any detected and blocked uploads | Zero-day anonymization failures not caught until tool is updated | Software change — add to design verification |
 | M-06 | S-06 | Corrective | Implement graceful degradation mode: if cloud AI is unavailable for >60s, display clear warning to radiologist and allow scan to proceed with manual-only review; alert on-call engineer | Radiologist workflow affected; no AI assistance during degradation | Software change |
+| M-07 | S-11 | Preventive | Treat the EMR interface (TB-6) as untrusted input: strict HL7 FHIR schema validation and input sanitisation on the workstation, run the FHIR parser in a sandboxed/least-privilege process, and mutually authenticate the EMR connection (OAuth 2.0 + pinned TLS) | Zero-day parser flaws remain until patched; a fully compromised EMR can still send well-formed but false data | Software change — add interface fuzzing to design verification |
 
 ---
 

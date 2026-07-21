@@ -13,7 +13,7 @@ Cloud AI inference service and cloud storage (anonymised images)
 Update delivery service and manufacturer backend
 All data flows and interfaces between the above (TB-1 through TB-5)
 Out of scope — what you exclude, and why:
-Hospital EMR/HIS — separate procurement and governance; modelled as a partially-trusted external system
+Hospital EMR/HIS — separate procurement and governance; modelled as a partially-trusted external system (boundary TB-6). We do not own it, but we validate all data crossing the EMR interface as untrusted input
 Hospital network hardware (switches, firewalls) — outside MediScanTech control; treated as the threat boundary rather than a controlled component
 
 ### 1.2 Assets — what are we protecting?
@@ -38,6 +38,7 @@ Hospital network hardware (switches, firewalls) — outside MediScanTech control
 | Workstation ↔ Local DICOM server | DICOM TCP/104 | None by default | None by default | Anyone on the hospital LAN |
 | Workstation ↔ Cloud AI service | HTTPS REST | Mutual TLS + API key | TLS 1.3 | Internet-facing |
 | Update delivery | Signed package pull over HTTPS | Package signing (RSA-2048) | TLS 1.3 | Internet-facing |
+| Workstation ↔ Hospital EMR (TB-6) | HL7 FHIR over HTTPS | OAuth 2.0 | TLS 1.3 | Partially-trusted external system |
 | Imaging unit ↔ Workstation | Proprietary USB | None (physical) | None | Physical access on-site |
 
 
@@ -68,6 +69,7 @@ Hospital network hardware (switches, firewalls) — outside MediScanTech control
 | S-08 | External attacker | As an attacker, I want to flood the cloud AI inference service, so that annotations are unavailable during active scans and the workflow is disrupted. | Cloud AI service | A |
 | S-09 | Opportunistic attacker | As an attacker, I want to exploit weak anonymisation (burned-in PHI in pixel data), so that PHI is transmitted to the cloud in the clear. | Anonymisation boundary | P |
 | S-10 | Malicious insider | As an admin-level attacker, I want to clear the audit logs on the workstation and DICOM server, so that my actions cannot be attributed. | Workstation + DICOM logs | P |
+| S-11 | External attacker (via hospital EMR) | As an attacker who has compromised the partially-trusted hospital EMR, I want to send malformed HL7 FHIR messages across the EMR interface to the workstation, so that I exploit a parser flaw to run code or feed corrupted patient/order data into a scan. | Workstation ↔ EMR (TB-6) | S |
 
 
 ### 2.2 Risk assessment
@@ -84,6 +86,7 @@ Hospital network hardware (switches, firewalls) — outside MediScanTech control
 | S-08 | 2 | Public endpoint; may lack rate limiting | 2 | Workflow disruption; radiologist can proceed without AI | 4 | No | Medium |
 | S-09 | 2 | Anonymisation bugs are a known DICOM issue class | 2 | PHI breach; GDPR exposure | 4 | No | Medium |
 | S-10 | 2 | Needs prior admin access; log clearing then trivial | 1 | Forensics impaired; no direct harm alone | 2 | No | Low |
+| S-11 | 2 | EMR is partially-trusted and outside our control; HL7/FHIR parser flaws are a known class | 3 | Code execution on the workstation or corrupted order data used during a scan | 6 | Yes | High |
 
 
 ## Q3: What are we going to do about it?
@@ -96,6 +99,7 @@ Hospital network hardware (switches, firewalls) — outside MediScanTech control
 | M-04 | S-01 | Corrective | Immutable off-site backups of the workstation image + tested restore runbook; EDR with isolation | Ransom pressure remains during restore window | Software change; no new submission |
 | M-05 | S-09 | Detective | Integrate a DICOM anonymisation audit tool that scans for burned-in PHI before upload and blocks/loggs failures | Zero-day anonymisation gaps missed until the tool updates | Add to design verification |
 | M-06 | S-08 | Compensating | Graceful degradation: if AI is unavailable >60s, warn the radiologist and allow manual-only review; alert on-call | No AI assistance during degradation | Software change |
+| M-07 | S-11 | Preventive | Treat the EMR interface (TB-6) as untrusted input: strict HL7 FHIR schema validation and sanitisation, run the FHIR parser in a sandboxed least-privilege process, and mutually authenticate the connection (OAuth 2.0 + pinned TLS) | Zero-day parser flaws remain until patched; a fully compromised EMR can still send well-formed but false data | Software change — add interface fuzzing to design verification |
 
 
 ## Q4: Did we do a good job?
