@@ -12,15 +12,17 @@
 │  │  Unit        │   Protocol    │                             │   │
 │  │  (RTOS)      │               │  Scanning software          │   │
 │  │              │               │  Admin console (:8443)      │   │
-│  └──────────────┘               └──────────┬───────────────── ┘   │
-│                                            │                       │
-│                                      Hospital LAN                  │
-│                                            │                       │
-│                               ┌────────────▼───────────┐          │
-│                               │  Local DICOM Server     │          │
-│                               │  (stores scan images)   │          │
-│                               └────────────────────────-┘          │
-│                                                                   │
+│  └──────────────┘               └────┬──────────────┬──────── ┘   │
+│                                      │              │              │
+│                                Hospital LAN    HL7 FHIR / HTTPS    │
+│                                      │              │ (TB-6)       │
+│                        ┌─────────────▼──────┐  ┌────▼───────────┐ │
+│                        │  Local DICOM Server│  ╎ Hospital EMR    ╎ │
+│                        │  (stores scan      │  ╎ (partially-     ╎ │
+│                        │   images)          │  ╎  trusted,       ╎ │
+│                        └────────────────────┘  ╎  hospital-owned)╎ │
+│                                                 └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ │
+│                              (dashed box = external, out-of-scope) │
 └──────────────────────────┬───────────────────────────────────────┘
                            │ Internet (TLS 1.3, mutual TLS)
                            │
@@ -58,6 +60,7 @@
 | **TB-3** | Hospital LAN ↔ Local DICOM server | Internal — should be on a dedicated VLAN but often is not |
 | **TB-4** | Hospital ↔ MediScanTech cloud | Internet — protected by mutual TLS; main external boundary |
 | **TB-5** | MediScanTech backend ↔ Update service | Internal cloud — must be authenticated and integrity-protected |
+| **TB-6** | Acquisition workstation ↔ Hospital EMR | External system, hospital-owned — separate security governance; treat as partially-trusted |
 
 ---
 
@@ -71,6 +74,7 @@
 | Device logs / telemetry | Low–Medium | Workstation → MediScanTech backend |
 | Firmware / software updates | High (integrity) | MediScanTech → Workstation + Imaging unit |
 | Admin credentials | Critical | Local admin console, remote support |
+| Diagnostic reports / patient & order data | High | Workstation ↔ Hospital EMR (HL7 FHIR) |
 
 ---
 
@@ -84,6 +88,7 @@
 | Local admin console | HTTPS (:8443) | Username/password | No MFA |
 | Remote support | VPN + SSH | Shared credential | **Known security gap** |
 | Update delivery | HTTPS | Package signing (RSA-2048) + TLS | |
+| Workstation → Hospital EMR | HL7 FHIR over HTTPS | OAuth 2.0 | External hospital-owned system; treat as partially-trusted |
 
 ---
 
@@ -94,3 +99,4 @@
 - The local admin console has **no MFA** and is accessible from anywhere on the hospital LAN.
 - Anonymisation is done in software by the acquisition workstation before images are uploaded — this logic has not been independently verified.
 - Remote support uses a **single shared credential** for all MediScanTech support staff.
+- The hospital EMR is **owned and operated by the hospital**, not MediScanTech. It is a **partially-trusted external dependency** (TB-6): the device exchanges data with it over HL7 FHIR but cannot assume it is secure, patched, or free of malicious input. Typically scoped *out* of the device threat model, with the boundary to it treated as a threat boundary.

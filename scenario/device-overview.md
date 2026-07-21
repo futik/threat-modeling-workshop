@@ -39,6 +39,12 @@ The system is **hybrid**: it has hardware on-premise in the hospital, and a clou
 | **Update delivery service** | Delivers firmware and software updates to on-premise components |
 | **Manufacturer backend** | MediScanTech internal systems: model training, monitoring, remote support |
 
+### External dependencies (not part of the device)
+
+| Component | Description |
+|-----------|-------------|
+| **Hospital EMR** | The hospital's Electronic Medical Record system. Owned and operated by the hospital, with its own procurement and security governance. The acquisition workstation exchanges data with it over HL7 FHIR (e.g. pushing diagnostic reports, pulling patient/order details). Because MediScanTech does not control it, treat it as a **partially-trusted external system** — usually scoped *out* of the device threat model, with the connection to it treated as a threat boundary. |
+
 ---
 
 ## How a scan works (data flow)
@@ -49,6 +55,7 @@ The system is **hybrid**: it has hardware on-premise in the hospital, and a clou
 4. Anonymised images sent to the cloud AI inference service (encrypted)
 5. Cloud returns AI diagnostic annotations → displayed to radiologist on the workstation
 6. MediScanTech pushes firmware and software updates to the workstation and imaging unit
+7. The workstation exchanges diagnostic reports and patient/order data with the hospital EMR over HL7 FHIR (external, hospital-owned system)
 
 ---
 
@@ -72,3 +79,4 @@ The system is **hybrid**: it has hardware on-premise in the hospital, and a clou
 - Remote support uses a **shared credential** — one login used by all MediScanTech support staff (known gap)
 - Anonymisation of images before cloud upload is done in software and has **not been independently audited**
 - The imaging unit firmware is patched approximately **every 18 months** due to regulatory constraints
+- The workstation integrates with the **hospital EMR**, which MediScanTech does not own or secure — treat it as a **partially-trusted external dependency** and do not assume data received from it is safe
