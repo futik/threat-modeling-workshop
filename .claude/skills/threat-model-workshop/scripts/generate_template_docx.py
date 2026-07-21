@@ -172,13 +172,17 @@ def render_architecture_png():
         ax.text(x + 1.5, y + h - 2.5, label, fontsize=10, fontweight="bold",
                 color=accent, va="top")
 
-    def box(cx, cy, w, h, lines):
+    def box(cx, cy, w, h, lines, external=False):
+        # external=True renders a dashed, greyed box for out-of-scope systems
+        edge = "#888888" if external else accent
+        fill = "#F2F2F2" if external else box_fill
         ax.add_patch(FancyBboxPatch(
             (cx - w / 2, cy - h / 2), w, h,
             boxstyle="round,pad=0.2,rounding_size=1.0",
-            linewidth=1.2, edgecolor=accent, facecolor=box_fill))
+            linewidth=1.2, edgecolor=edge, facecolor=fill,
+            linestyle="--" if external else "-"))
         ax.text(cx, cy, "\n".join(lines), fontsize=8, ha="center", va="center",
-                color="#111111")
+                color="#444444" if external else "#111111")
 
     def arrow(x1, y1, x2, y2, label=None, two_way=False, ls="-"):
         ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
@@ -195,8 +199,11 @@ def render_architecture_png():
     box(68, 78, 34, 14, ["Acquisition Workstation", "(Windows 10)",
                          "Scanning SW · Admin console :8443"])
     box(68, 61, 30, 9, ["Local DICOM Server", "(stores scan images)"])
+    box(24, 61, 28, 9, ["Hospital EMR", "(external, partially-trusted)"],
+        external=True)
     arrow(35, 78, 51, 78, "USB / proprietary", two_way=True)
     arrow(68, 71, 68, 65.5, "Hospital LAN")
+    arrow(53, 74, 34, 65.8, "HL7 FHIR (TB-6)", two_way=True, ls="--")
 
     # Cloud zone (bottom)
     zone(4, 6, 92, 40, "MEDISCANTECH CLOUD")
@@ -311,6 +318,9 @@ def add_product_section(doc):
         "independently audited",
         "The imaging unit firmware is patched approximately every 18 months due to regulatory "
         "constraints",
+        "The workstation integrates with the hospital EMR, which MediScanTech does not own or "
+        "secure — treat it as a partially-trusted external dependency and do not assume data "
+        "received from it is safe",
     ])
 
     # --- Architecture diagram ---
@@ -336,6 +346,9 @@ def add_product_section(doc):
                         "Internet — protected by mutual TLS; main external boundary"],
                        ["TB-5", "MediScanTech backend ↔ Update service",
                         "Internal cloud — must be authenticated and integrity-protected"],
+                       ["TB-6", "Acquisition workstation ↔ Hospital EMR",
+                        "External system, hospital-owned — separate security governance; "
+                        "treat as partially-trusted"],
                    ])
 
     # --- Data flows ---
@@ -355,6 +368,8 @@ def add_product_section(doc):
                         "MediScanTech → Workstation + Imaging unit"],
                        ["Admin credentials", "Critical",
                         "Local admin console, remote support"],
+                       ["Diagnostic reports / patient & order data", "High",
+                        "Workstation ↔ Hospital EMR (HL7 FHIR)"],
                    ])
 
     # --- Interfaces ---
@@ -370,6 +385,8 @@ def add_product_section(doc):
                        ["Local admin console", "HTTPS (:8443)", "Username/password", "No MFA"],
                        ["Remote support", "VPN + SSH", "Shared credential", "Known security gap"],
                        ["Update delivery", "HTTPS", "Package signing (RSA-2048) + TLS", ""],
+                       ["Workstation → Hospital EMR", "HL7 FHIR over HTTPS", "OAuth 2.0",
+                        "External hospital-owned system; treat as partially-trusted"],
                    ])
 
 
