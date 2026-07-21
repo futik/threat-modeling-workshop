@@ -35,8 +35,15 @@ threat-modeling-workshop/
 │   └── q4-did-we-do-a-good-job.md               ← validation, review, documentation
 │
 ├── templates/
-│   ├── threat-model-template.md     ← blank worksheet for participants
-│   └── example-filled-template.md  ← worked example for reference
+│   └── threat-model-template.md     ← blank worksheet for participants
+│
+├── examples/                        ← worked (filled-in) examples, not for editing
+│   ├── filled-template/             ← the reference threat model, filled in
+│   │   ├── example-filled-template.md
+│   │   └── example-filled-template.docx
+│   └── submissions/                 ← three sample teams, already evaluated
+│
+├── submissions/                     ← real participant worksheets go here
 │
 ├── prompts/
 │   ├── threat-model-system-prompt.md   ← system prompt: generate a threat model
@@ -56,7 +63,7 @@ threat-modeling-workshop/
 4. Follow the four questions in `workshop/q1-what-are-we-working-on.md` → `q4-did-we-do-a-good-job.md` as guided by the facilitator.
 5. At the end, submit your completed template as instructed — it will be evaluated by an AI model for feedback.
 
-If you get stuck, check [`templates/example-filled-template.md`](templates/example-filled-template.md) for a reference example.
+If you get stuck, check [`examples/filled-template/example-filled-template.md`](examples/filled-template/example-filled-template.md) for a reference example.
 
 ---
 
