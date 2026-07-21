@@ -4,7 +4,7 @@ Generate sample participant submissions (filled worksheets) as .docx files.
 
 This produces the kind of files teams hand back after the workshop: the Q1-Q4
 worksheet, filled in, exported as .docx. It writes one .docx per team into the
-submissions-example/ folder (the committed worked example), so the
+examples/submissions/ folder (the committed worked example), so the
 batch-evaluation workflow (see SKILL.md, Mode B) has realistic inputs to iterate
 over. Real participant submissions go in submissions/ instead.
 
@@ -22,7 +22,7 @@ extract_submission.py reads it back the same way it reads real submissions.
 
 Usage:
     python generate_sample_submissions.py [output_dir]
-Default output dir: ../../../submissions-example
+Default output dir: ../../../examples/submissions
 """
 
 import sys
@@ -447,7 +447,7 @@ TEAMS = [TEAM_AEGIS, TEAM_MERIDIAN, TEAM_NORTHWIND]
 
 def main():
     out_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else (
-        Path(__file__).resolve().parents[4] / "submissions-example"
+        Path(__file__).resolve().parents[4] / "examples" / "submissions"
     )
     out_dir.mkdir(parents=True, exist_ok=True)
     for team in TEAMS:

@@ -2,9 +2,10 @@
 """
 Render the filled reference example to a Google-Docs-friendly .docx.
 
-Source of truth is templates/example-filled-template.md (the completed
-"Facilitators — Reference Example" threat model that uses attacker stories). This
-script renders that markdown to templates/example-filled-template.docx so
+Source of truth is examples/filled-template/example-filled-template.md (the
+completed "Facilitators — Reference Example" threat model that uses attacker
+stories). This script renders that markdown to
+examples/filled-template/example-filled-template.docx so
 facilitators can hand out or upload the worked example in the same format teams
 use, and so it stays in sync with the markdown rather than being maintained twice.
 
@@ -19,7 +20,7 @@ Requirements: python-docx.
 
 Usage:
     python generate_example_docx.py [output_path]
-Default output: ../../../templates/example-filled-template.docx
+Default output: ../../../examples/filled-template/example-filled-template.docx
 """
 
 import re
@@ -36,8 +37,8 @@ from generate_template_docx import (  # noqa: E402
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
-DEFAULT_SRC = REPO_ROOT / "templates" / "example-filled-template.md"
-DEFAULT_OUT = REPO_ROOT / "templates" / "example-filled-template.docx"
+DEFAULT_SRC = REPO_ROOT / "examples" / "filled-template" / "example-filled-template.md"
+DEFAULT_OUT = REPO_ROOT / "examples" / "filled-template" / "example-filled-template.docx"
 
 BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
 

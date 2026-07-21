@@ -92,9 +92,9 @@ To hand out the completed worked example in the same format teams use:
 python scripts/generate_example_docx.py [optional_output_path]
 ```
 
-This renders `templates/example-filled-template.md` (the "Facilitators — Reference
+This renders `examples/filled-template/example-filled-template.md` (the "Facilitators — Reference
 Example" threat model, which uses attacker stories) to
-`templates/example-filled-template.docx`, reusing the same fonts, heading styles,
+`examples/filled-template/example-filled-template.docx`, reusing the same fonts, heading styles,
 and shaded tables as the blank worksheet. The markdown is the source of truth —
 edit it and re-run rather than editing the `.docx`. Only `python-docx` is needed
 (no matplotlib; the example has no rendered diagram).
@@ -112,7 +112,7 @@ Two folders:
 - `submissions/` — **real participant work**. Git-ignored by default (only its
   README is committed) so team submissions aren't published unless you choose to.
   The `prepare`/`aggregate` commands default here.
-- `submissions-example/` — a **committed worked example** (three fictional teams,
+- `examples/submissions/` — a **committed worked example** (three fictional teams,
   already evaluated). Pass it explicitly as the folder argument to work on it.
 
 Inputs a team may hand back (all go in `submissions/`, named
@@ -188,24 +188,24 @@ right, what most teams missed, and the biggest gap between the highest and lowes
 scoring teams. Use the batch prompt at the end of
 `prompts/evaluation-system-prompt.md` as a guide.
 
-### The worked example (`submissions-example/`)
+### The worked example (`examples/submissions/`)
 
-`submissions-example/` holds a committed, fully-evaluated sample set — three
+`examples/submissions/` holds a committed, fully-evaluated sample set — three
 fictional teams (`team-aegis` strong, `team-meridian` medium, `team-northwind`
 weak) with their feedback and comparison. Use it as a reference for what the
 outputs should look like, or to exercise the pipeline without real data.
 
 `scripts/generate_sample_submissions.py` (re)writes those three `.docx` files; it
-defaults to `submissions-example/`. To evaluate that folder rather than the real
+defaults to `examples/submissions/`. To evaluate that folder rather than the real
 `submissions/`, pass it explicitly:
 
 ```
-python scripts/generate_sample_submissions.py                       # -> submissions-example/
-python scripts/evaluate_submissions.py prepare submissions-example
-python scripts/evaluate_submissions.py aggregate submissions-example
+python scripts/generate_sample_submissions.py                       # -> examples/submissions/
+python scripts/evaluate_submissions.py prepare examples/submissions
+python scripts/evaluate_submissions.py aggregate examples/submissions
 ```
 
-See `submissions-example/README.md`. Real participant work goes in `submissions/`
+See `examples/submissions/README.md`. Real participant work goes in `submissions/`
 and is git-ignored by default.
 
 ---
@@ -216,12 +216,12 @@ and is git-ignored by default.
   Architecture + fillable worksheet) as page-break sections, with the architecture
   diagram rendered as an embedded PNG.
 - `scripts/generate_example_docx.py` — renders the filled reference example
-  (`templates/example-filled-template.md`) to
-  `templates/example-filled-template.docx`.
+  (`examples/filled-template/example-filled-template.md`) to
+  `examples/filled-template/example-filled-template.docx`.
 - `scripts/extract_submission.py` — converts a filled `.docx` back to markdown
   (headings + tables) for evaluation.
 - `scripts/generate_sample_submissions.py` — writes sample filled worksheets for
-  three teams of varying quality into `submissions-example/` (the worked example).
+  three teams of varying quality into `examples/submissions/` (the worked example).
 - `scripts/evaluate_submissions.py` — batch driver: `prepare` assembles per-team
   evaluation payloads; `aggregate` parses the `scores` blocks and builds the
   cross-team score matrix in `comparison-summary.md`.
@@ -240,15 +240,15 @@ and is git-ignored by default.
   guidance notes; grounds dimension-6 scoring.
 - `submissions/` — real participant worksheets, feedback, and comparison (git-
   ignored by default); see `submissions/README.md`.
-- `submissions-example/` — the committed worked example (three fictional teams,
-  evaluated); see `submissions-example/README.md`.
+- `examples/submissions/` — the committed worked example (three fictional teams,
+  evaluated); see `examples/submissions/README.md`.
 
 ## Notes
 
 - The batch workflow keeps deterministic work in Python (`evaluate_submissions.py`)
   and judgement in the LLM, so payloads and score maths are repeatable while the
   assessment stays qualitative.
-- The worked example in `submissions-example/` is committed; real participant
+- The worked example in `examples/submissions/` is committed; real participant
   work in `submissions/` is git-ignored by default (only its README is tracked)
   and can be committed per the facilitator's preference. `_eval-input-*.md`
   intermediates are git-ignored in both folders.

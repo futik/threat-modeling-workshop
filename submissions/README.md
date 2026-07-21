@@ -3,7 +3,7 @@
 Drop **real participant submissions** here after the workshop, then run the
 batch-evaluation workflow over them.
 
-Looking for a worked example? See [`../submissions-example/`](../submissions-example/),
+Looking for a worked example? See [`../examples/submissions/`](../examples/submissions/),
 which contains three fictional teams already evaluated end to end.
 
 ## How teams submit
@@ -33,8 +33,8 @@ python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py aggr
 different folder (e.g. the example set), pass it as an argument:
 
 ```
-python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py prepare submissions-example
-python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py aggregate submissions-example
+python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py prepare examples/submissions
+python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py aggregate examples/submissions
 ```
 
 ## What ends up here

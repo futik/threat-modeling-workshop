@@ -5,7 +5,7 @@ end: three fictional teams of varying quality, already scored and compared. Use 
 to see what good/medium/weak submissions look like and what the feedback and
 comparison outputs should contain.
 
-Real participant work goes in [`../submissions/`](../submissions/), not here.
+Real participant work goes in [`../../submissions/`](../../submissions/), not here.
 
 ## What's here
 
@@ -28,16 +28,16 @@ Northwind 9/30.
 python .claude/skills/threat-model-workshop/scripts/generate_sample_submissions.py
 
 # 2. Extract + assemble evaluation payloads for this folder
-python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py prepare submissions-example
+python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py prepare examples/submissions
 
 # 3. (LLM writes feedback-<team>.md for each payload)
 
 # 4. Aggregate the scores into comparison-summary.md
-python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py aggregate submissions-example
+python .claude/skills/threat-model-workshop/scripts/evaluate_submissions.py aggregate examples/submissions
 ```
 
 `generate_sample_submissions.py` defaults to this folder. The `prepare`/`aggregate`
-commands default to `submissions/`, so pass `submissions-example` explicitly when
+commands default to `submissions/`, so pass `examples/submissions` explicitly when
 regenerating the example.
 
 Scripts live in `.claude/skills/threat-model-workshop/scripts/`.
